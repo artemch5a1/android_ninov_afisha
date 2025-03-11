@@ -70,4 +70,18 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.8.6")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
 
+    //Ktor
+    //Ktor
+    implementation(libs.ktor.client.android)
+
+    //Navigation
+    implementation (libs.androidx.navigation.compose)
+
+    //ViewModel
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+
+    implementation(platform(libs.bom))
+    implementation(libs.postgrest.kt)
+    implementation(libs.auth.kt)
+    implementation(libs.realtime.kt)
 }
