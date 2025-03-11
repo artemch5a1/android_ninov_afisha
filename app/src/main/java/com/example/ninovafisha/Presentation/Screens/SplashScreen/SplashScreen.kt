@@ -85,7 +85,7 @@ fun SplashScreen(controlNav: NavHostController) {
                 Spacer(modifier = Modifier.padding(16.dp))
 
                 Text(
-                    text = "NiNovAfiha",
+                    text = "NiNovAfisha",
                     style = TextStyle(
                         fontSize = 20.sp, // Размер шрифта
                         fontFamily = FontFamily.SansSerif, // Шрифт
