@@ -83,7 +83,7 @@ fun SigninScreen(controlNav: NavHostController, signInViewModel: SignInViewModel
                 }
                 is ActualState.Loading -> {
                     CircularProgressIndicator(
-                        modifier = Modifier.size(48.dp), // Размер индикатора
+                        modifier = Modifier.size(48.dp).align(Alignment.CenterHorizontally), // Размер индикатора
                         color = Color.Blue, // Цвет индикатора
                         strokeWidth = 4.dp // Толщина линии
                     )
