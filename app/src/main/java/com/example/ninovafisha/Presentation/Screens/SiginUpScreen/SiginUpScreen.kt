@@ -33,11 +33,11 @@ fun SignUpScreen(controlNav: NavHostController){
                     .padding(bottom = 16.dp)
                     .align(Alignment.CenterHorizontally))
 
-            myField(myText = "Введите email")
+            /*myField(myText = "Введите email")
             myField(myText = "Введите ваше имя")
             myField(myText = "Введите вашу фамилию")
             myField(myText = "Введите пароль")
-            myField(myText = "Введите подтверждение пароля")
+            myField(myText = "Введите подтверждение пароля")*/
 
             Spacer(modifier = Modifier.padding(10.dp))
 

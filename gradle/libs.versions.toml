@@ -36,7 +36,7 @@ bom = { module = "io.github.jan-tennert.supabase:bom", version.ref = "bom" }
 postgrest-kt = { module = "io.github.jan-tennert.supabase:postgrest-kt" }
 auth-kt = { module = "io.github.jan-tennert.supabase:auth-kt" }
 realtime-kt = { module = "io.github.jan-tennert.supabase:realtime-kt" }
-
+storage-kt = { module = "io.github.jan-tennert.supabase:storage-kt" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

@@ -86,4 +86,5 @@ dependencies {
     implementation(libs.postgrest.kt)
     implementation(libs.auth.kt)
     implementation(libs.realtime.kt)
+    implementation (libs.storage.kt)
 }

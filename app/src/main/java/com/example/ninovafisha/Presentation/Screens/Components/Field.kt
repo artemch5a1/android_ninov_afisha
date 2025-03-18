@@ -17,8 +17,8 @@ import androidx.compose.ui.unit.dp
 
 
 @Composable
-fun myField(myText: String){
-    var text by remember { mutableStateOf("") }
+fun myField(myText: String, text: String, onValueChange: (String) -> Unit){
+    /*var text by remember { mutableStateOf("") }*/
     OutlinedTextField(
         colors = TextFieldDefaults.colors(
             focusedContainerColor = Color.White,
@@ -27,7 +27,7 @@ fun myField(myText: String){
             focusedIndicatorColor = Color.White,
         ),
         value = text,
-        onValueChange = { text = it },
+        onValueChange = onValueChange,
         label = { Text(myText) },
         shape = RoundedCornerShape(15.dp),
         modifier = Modifier.fillMaxWidth()
