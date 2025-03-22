@@ -27,11 +27,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.ninovafisha.Domain.States.ActualState
 import com.example.ninovafisha.Presentation.Screens.Components.myField
+import com.example.ninovafisha.Presentation.Screens.Components.myFieldPass
 
 @Composable
 fun SigninScreen(controlNav: NavHostController, signInViewModel: SignInViewModel = viewModel()){
 
     val actualState by signInViewModel.actualState.collectAsState()
+    val signinState = signInViewModel.signInState
 
     var email by remember { mutableStateOf("") }
     var pass by remember { mutableStateOf("") }
@@ -49,8 +51,13 @@ fun SigninScreen(controlNav: NavHostController, signInViewModel: SignInViewModel
                     .padding(bottom = 16.dp)
                     .align(Alignment.CenterHorizontally))
 
-            myField(myText = "Введите email", text = email, onValueChange = {email = it})
-            myField(myText = "Введите пароль", text = pass, onValueChange = {pass = it})
+            myField(myText = "Введите email",
+                text = signinState.email,
+                onValueChange = {it -> signInViewModel.updateSign(signinState.copy(email = it))})
+
+            myFieldPass(myText = "Введите пароль",
+                text = signinState.password,
+                onValueChange = {it -> signInViewModel.updateSign(signinState.copy(password = it))})
 
             Spacer(modifier = Modifier.padding(10.dp))
 
@@ -66,10 +73,10 @@ fun SigninScreen(controlNav: NavHostController, signInViewModel: SignInViewModel
 
 
             when (actualState){
-                is ActualState.Ready -> {
+                is ActualState.Initialized -> {
                     Button(
                         onClick = {
-                            signInViewModel.SignInLogic(_email = email, _password = pass)
+                            signInViewModel.SignInLogic()
                         },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color.Gray,
@@ -91,7 +98,7 @@ fun SigninScreen(controlNav: NavHostController, signInViewModel: SignInViewModel
                 is ActualState.Error -> {
                     Button(
                         onClick = {
-                            signInViewModel.SignInLogic(_email = email, _password = pass)
+                            signInViewModel.SignInLogic()
                         },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color.Gray,

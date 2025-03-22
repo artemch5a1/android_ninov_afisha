@@ -2,10 +2,12 @@ package com.example.ninovafisha.Presentation.Screens.SignInScreen
 
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ninovafisha.Domain.Constant
 import com.example.ninovafisha.Domain.States.ActualState
+import com.example.ninovafisha.Domain.States.SignInState
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.providers.builtin.Email
@@ -18,19 +20,26 @@ import kotlinx.coroutines.withTimeout
 
 
 class SignInViewModel: ViewModel() {
-    private val _actualState = MutableStateFlow<ActualState>(ActualState.Ready)
+    private val _actualState = MutableStateFlow<ActualState>(ActualState.Initialized)
     val actualState: StateFlow<ActualState> = _actualState.asStateFlow()
 
-    fun SignInLogic(_email:String, _password:String) {
+    private val _signInState = mutableStateOf(SignInState())
+    val signInState: SignInState get() = _signInState.value
+
+    fun updateSign(newSign: SignInState){
+        _signInState.value = newSign
+    }
+
+    fun SignInLogic() {
         _actualState.value = ActualState.Loading
         viewModelScope.launch {
             try {
-                Log.d("SignInViewModel", "Попытка входа: email=$_email, password=$_password")
+                Log.d("SignInViewModel", "Попытка входа: email=${signInState.email}, password=${signInState.password}")
                 withTimeout(8000){
                     Constant.supabase.auth.signInWith(Email)
                     {
-                        email = _email
-                        password = _password
+                        email = signInState.email
+                        password = signInState.password
                     }
                 }
                 _actualState.value = ActualState.Success("Норм")

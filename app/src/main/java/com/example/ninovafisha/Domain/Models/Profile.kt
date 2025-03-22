@@ -5,8 +5,9 @@ import kotlinx.serialization.SerialName
 
 @Serializable
 data class Profile (
-    val username:String,
+    val name:String,
     val surname: String,
     @SerialName("datebirth")
-    val datebith:String?
+    val datebith:String?,
+    val id:String?
 )
