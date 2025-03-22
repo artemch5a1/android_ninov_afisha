@@ -5,6 +5,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ninovafisha.Domain.Constant
 import com.example.ninovafisha.Domain.Constant.supabase
 import com.example.ninovafisha.Domain.Models.Profile
 import com.example.ninovafisha.Domain.States.ActualState
@@ -35,16 +36,20 @@ class SignUpViewModel: ViewModel() {
             if(signupstate.password == signupstate.confirmPass){
                 viewModelScope.launch {
                     try {
-                        val authResponse = supabase.auth.signUpWith(Email)
+                        supabase.auth.signUpWith(Email)
                         {
                             email = signupstate.email
                             password = signupstate.password
-                        }
-                        val userId: String? = authResponse?.id
+                            val userId = Constant.supabase.auth.currentUserOrNull()
 
-                        val profile = Profile(signupstate.name, signupstate.surname, signupstate.datebith, userId)
-                        supabase.from("Profile").insert(profile)
-                        _actualState.value = ActualState.Success("")
+                            if(userId != null){
+                                val profile = Profile(signupstate.name, signupstate.surname, signupstate.datebith, userId.id)
+                                viewModelScope.launch {
+                                    supabase.from("Profile").insert(profile)
+                                }
+                                _actualState.value = ActualState.Success("")
+                            }
+                        }
                     }
                     catch (ex: Exception){
                         _actualState.value = ActualState.Error(ex.message ?: "Ошибка получения данных")
