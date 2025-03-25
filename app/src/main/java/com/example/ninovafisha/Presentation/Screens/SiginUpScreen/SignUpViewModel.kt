@@ -40,16 +40,13 @@ class SignUpViewModel: ViewModel() {
                         {
                             email = signupstate.email
                             password = signupstate.password
+                        }
                             val userId = Constant.supabase.auth.currentUserOrNull()
-
                             if(userId != null){
                                 val profile = Profile(signupstate.name, signupstate.surname, signupstate.datebith, userId.id)
-                                viewModelScope.launch {
-                                    supabase.from("Profile").insert(profile)
-                                }
+                                supabase.from("Profile").insert(profile)
                                 _actualState.value = ActualState.Success("")
                             }
-                        }
                     }
                     catch (ex: Exception){
                         _actualState.value = ActualState.Error(ex.message ?: "Ошибка получения данных")
