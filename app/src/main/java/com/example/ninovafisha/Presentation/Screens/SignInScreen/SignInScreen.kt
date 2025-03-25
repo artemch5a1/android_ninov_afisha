@@ -62,7 +62,7 @@ fun SigninScreen(controlNav: NavHostController, signInViewModel: SignInViewModel
             Spacer(modifier = Modifier.padding(10.dp))
 
             Text(
-                text = "Нет аккаунта? Зарегестрируйтесь.",
+                text = "Нет аккаунта? Зарегистрируйтесь.",
                 fontSize = 16.sp,
                 color = Color.Black,
                 fontWeight = FontWeight.W400,

@@ -1,5 +1,8 @@
 package com.example.ninovafisha.Presentation.Screens.SiginUpScreen
 
+import android.app.DatePickerDialog
+import android.widget.DatePicker
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -13,9 +16,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,11 +32,29 @@ import com.example.ninovafisha.Domain.States.ActualState
 import com.example.ninovafisha.Presentation.Screens.Components.myField
 import com.example.ninovafisha.Presentation.Screens.Components.myFieldPass
 import kotlinx.coroutines.flow.MutableStateFlow
+import java.util.Calendar
+import java.util.Date
 
 @Composable
 fun SignUpScreen(controlNav: NavHostController, signUpViewModel: SignUpViewModel = viewModel()){
     val actualState by signUpViewModel.actualState.collectAsState()
     val signupState = signUpViewModel.signupstate
+
+    val mContext = LocalContext.current // Получение контекста Android
+
+    val mYear: Int
+    val mMonth: Int
+    val mDay: Int
+
+    val mCalendar = Calendar.getInstance()
+
+    mYear = mCalendar.get(Calendar.YEAR)
+    mMonth = mCalendar.get(Calendar.MONTH)
+    mDay = mCalendar.get(Calendar.DAY_OF_MONTH)
+
+    mCalendar.time = Date()
+
+    val mDate = remember { mutableStateOf("Выберите дату") }
 
 
     Box(modifier = Modifier.fillMaxSize(),
@@ -63,9 +87,27 @@ fun SignUpScreen(controlNav: NavHostController, signUpViewModel: SignUpViewModel
                 onValueChange = {it -> signUpViewModel.updateSignup(signupState.copy(password = it))})
 
 
-            myField(myText = "Введите подтверждение пароля",
+            myFieldPass(myText = "Введите подтверждение пароля",
                 text = signupState.confirmPass,
                 onValueChange = {it -> signUpViewModel.updateSignup(signupState.copy(confirmPass = it))})
+
+            val mDatePickerDialog = DatePickerDialog(
+                mContext,
+                { _: DatePicker, mYear: Int, mMonth: Int, mDayOfMonth: Int ->
+                    mDate.value = "$mYear-${mMonth+1}-$mDayOfMonth"
+                    signUpViewModel.updateSignup(signupState.copy(datebith = "$mYear-${mMonth+1}-$mDayOfMonth"))
+                }, mYear, mMonth, mDay
+            )
+
+            Spacer(modifier = Modifier.padding(10.dp))
+
+            Text(
+                text = mDate.value,
+                fontSize = 18.sp,
+                modifier = Modifier.align(alignment = Alignment.CenterHorizontally).clickable {
+                    mDatePickerDialog.show()
+                }
+            )
 
             Spacer(modifier = Modifier.padding(10.dp))
 
@@ -84,6 +126,18 @@ fun SignUpScreen(controlNav: NavHostController, signUpViewModel: SignUpViewModel
 
                         Text(text = "Зарегистрироваться", fontSize = 18.sp)
                     }
+                    Spacer(modifier = Modifier.padding(10.dp))
+                    Text(
+                        text = "Уже есть аккаунт? Войдите...",
+                        fontSize = 16.sp,
+                        color = Color.Black,
+                        fontWeight = FontWeight.W400,
+                        modifier = Modifier
+                            .padding(bottom = 16.dp)
+                            .align(Alignment.CenterHorizontally)
+                            .clickable { controlNav.navigate("sigin") }
+                    )
+
                 }
                 is ActualState.Loading ->
                 {
@@ -116,6 +170,17 @@ fun SignUpScreen(controlNav: NavHostController, signUpViewModel: SignUpViewModel
                         modifier = Modifier
                             .padding(bottom = 16.dp)
                             .align(Alignment.CenterHorizontally)
+                    )
+                    Spacer(modifier = Modifier.padding(10.dp))
+                    Text(
+                        text = "Уже есть аккаунт? Войдите...",
+                        fontSize = 16.sp,
+                        color = Color.Black,
+                        fontWeight = FontWeight.W400,
+                        modifier = Modifier
+                            .padding(bottom = 16.dp)
+                            .align(Alignment.CenterHorizontally)
+                            .clickable { controlNav.navigate("sigin") }
                     )
                 }
                 is ActualState.Success ->
