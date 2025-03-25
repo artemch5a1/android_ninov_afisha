@@ -27,6 +27,7 @@ class SignUpViewModel: ViewModel() {
     private val _signupState = mutableStateOf(Signupstate())
     val signupstate: Signupstate get() = _signupState.value
 
+
     fun updateSignup(newState: Signupstate){
         _signupState.value = newState
     }

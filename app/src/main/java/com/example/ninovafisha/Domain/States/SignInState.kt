@@ -2,5 +2,6 @@ package com.example.ninovafisha.Domain.States
 
 data class SignInState (
     val email: String = "",
-    val password: String = ""
+    val password: String = "",
+    val id: String? = ""
 )
