@@ -32,13 +32,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.*
 
 @Composable
-fun MainScreen(controlNav: NavHostController, viewModelMainScreen: ViewModelMainScreen = viewModel(), signInViewModel: SignInViewModel = viewModel()) {
+fun MainScreen(controlNav: NavHostController, viewModelMainScreen: ViewModelMainScreen = viewModel()) {
 
     var greetingText by remember { mutableStateOf<String?>(null) }
 
 // 2. Загружаем данные при инициализации или по необходимости
     LaunchedEffect(Unit) {
-        val part1 = viewModelMainScreen.GetSignin(signInViewModel) ?: ""
+        val part1 = viewModelMainScreen.GetSignin() ?: ""
         greetingText = part1
     }
 
@@ -53,12 +53,15 @@ fun MainScreen(controlNav: NavHostController, viewModelMainScreen: ViewModelMain
                 fontSize = 32.sp,
                 color = Color.Black,
                 fontWeight = FontWeight.W800,
-                modifier = Modifier.padding(bottom = 16.dp).align(alignment = Alignment.CenterHorizontally)
+                modifier = Modifier
+                    .padding(bottom = 16.dp)
+                    .align(alignment = Alignment.CenterHorizontally)
             )
 
             Button(
                 onClick = {
                     controlNav.navigate("sigin")
+                    viewModelMainScreen.GetOut()
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Gray,

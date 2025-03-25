@@ -24,7 +24,7 @@ class ViewModelMainScreen: ViewModel() {
         var name = filt?.name
     }*/
 
-    suspend fun GetSignin(signInViewModel: SignInViewModel): String{
+    suspend fun GetSignin(): String{
         return withContext(Dispatchers.IO) {
             try {
                 var name = Constant.supabase.postgrest.from("public", "Profile").select().decodeList<Profile>().firstOrNull { p -> p.id == Constant.supabase.auth.currentUserOrNull()!!.id }!!.name
@@ -32,6 +32,14 @@ class ViewModelMainScreen: ViewModel() {
             } catch (ex: AuthRestException) {
                 "Ошибка: " + ex.message
             }
+            catch (ex: Exception){
+                "авторизация не выполнена"
+            }
+        }
+    }
+    fun GetOut(){
+        viewModelScope.launch {
+            Constant.supabase.auth.signOut()
         }
     }
 }
