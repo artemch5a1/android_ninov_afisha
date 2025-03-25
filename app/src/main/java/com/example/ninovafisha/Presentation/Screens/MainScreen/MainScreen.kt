@@ -19,6 +19,9 @@ import com.example.ninovafisha.Presentation.Screens.Components.myField
 
 @Composable
 fun MainScreen(controlNav: NavHostController) {
+
+
+
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center

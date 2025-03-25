@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.ninovafisha.Domain.Constant
 import com.example.ninovafisha.Domain.States.ActualState
 import com.example.ninovafisha.Domain.States.SignInState
+import com.example.ninovafisha.Domain.Utils.isEmailValid
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.providers.builtin.Email
@@ -33,28 +34,32 @@ class SignInViewModel: ViewModel() {
     fun SignInLogic() {
         _actualState.value = ActualState.Loading
         viewModelScope.launch {
-            try {
-                Log.d("SignInViewModel", "Попытка входа: email=${signInState.email}, password=${signInState.password}")
-                withTimeout(8000){
-                    Constant.supabase.auth.signInWith(Email)
-                    {
-                        email = signInState.email
-                        password = signInState.password
+            if(!signInState.email.isEmailValid()) {
+                _actualState.value = ActualState.Error("Неправильный email")
+            }
+            else{
+                try {
+                    Log.d("SignInViewModel", "Попытка входа: email=${signInState.email}, password=${signInState.password}")
+                    withTimeout(8000){
+                        Constant.supabase.auth.signInWith(Email)
+                        {
+                            email = signInState.email
+                            password = signInState.password
+                        }
                     }
+                    _actualState.value = ActualState.Success("Норм")
                 }
-                _actualState.value = ActualState.Success("Норм")
+                catch (_ex: AuthRestException){
+                    _actualState.value = ActualState.Error(_ex.errorDescription?: "Ошибка получения данных")
+                }
+                catch(ex: TimeoutCancellationException){
+                    _actualState.value = ActualState.Error("Превышено время ожидания: ${ex.message}")
+                }
+                catch (ex: Exception) {
+                    Log.e("SignInViewModel", "Неожиданная ошибка", ex)
+                    _actualState.value = ActualState.Error("Неожиданная ошибка: ${ex.message}")
+                }
             }
-            catch (_ex: AuthRestException){
-                _actualState.value = ActualState.Error(_ex.errorDescription?: "Ошибка получения данных")
-            }
-            catch(ex: TimeoutCancellationException){
-                _actualState.value = ActualState.Error("Превышено время ожидания: ${ex.message}")
-            }
-            catch (ex: Exception) {
-                Log.e("SignInViewModel", "Неожиданная ошибка", ex)
-                _actualState.value = ActualState.Error("Неожиданная ошибка: ${ex.message}")
-            }
-
         }
     }
 }
