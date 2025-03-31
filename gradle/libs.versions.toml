@@ -13,6 +13,9 @@ lifecycleViewmodelCompose = "2.8.7"
 navigationCompose = "2.8.6"
 bom = "3.1.0"
 animationCoreLint = "1.8.0-rc01"
+runtimeLivedata = "1.7.8"
+coilCompose = "2.7.0"
+roomKtx = "2.6.1"
 
 
 [libraries]
@@ -39,6 +42,9 @@ auth-kt = { module = "io.github.jan-tennert.supabase:auth-kt" }
 realtime-kt = { module = "io.github.jan-tennert.supabase:realtime-kt" }
 storage-kt = { module = "io.github.jan-tennert.supabase:storage-kt" }
 androidx-animation-core-lint = { group = "androidx.compose.animation", name = "animation-core-lint", version.ref = "animationCoreLint" }
+androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomKtx" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
