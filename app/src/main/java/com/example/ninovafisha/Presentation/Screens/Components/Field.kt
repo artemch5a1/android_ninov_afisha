@@ -77,3 +77,21 @@ fun myFieldPass(myText: String, text: String, onValueChange: (String) -> Unit) {
         }
     )
 }
+
+@Composable
+fun myFieldSearch(myText: String, text: String, onValueChange: (String) -> Unit) {
+    var passSee by remember { mutableStateOf(false) }
+
+    OutlinedTextField(
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.White,
+            unfocusedContainerColor = Color.White,
+            unfocusedIndicatorColor = Color.White,
+            focusedIndicatorColor = Color.White,
+        ),
+        value = text,
+        onValueChange = onValueChange,
+        label = { Text(myText) },
+        shape = RoundedCornerShape(15.dp)
+    )
+}

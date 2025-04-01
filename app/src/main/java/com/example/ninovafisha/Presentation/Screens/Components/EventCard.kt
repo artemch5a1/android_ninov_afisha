@@ -10,24 +10,31 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.ninovafisha.Domain.Models.Event
+import com.example.ninovafisha.R
 
 @Composable
 fun EventCard(event: Event?){
     Column(modifier = Modifier.padding(16.dp).padding(top = 50.dp).padding(end = 16.dp)) {
 
+        val imageModel = event?.image.takeIf { !it.isNullOrEmpty() }
+            ?: R.drawable.empty // Запасное изображение
+
         AsyncImage(
-            model = event?.image,
+            model = imageModel,
             contentDescription = "Концертное изображение",
             modifier = Modifier
                 .fillMaxWidth()
                 .height(200.dp)
                 .padding(bottom = 16.dp),
-            contentScale = ContentScale.Crop
+            contentScale = ContentScale.Crop,
+            error = painterResource(R.drawable.empty), // Если ошибка загрузки
+            placeholder = painterResource(R.drawable.empty) // Плейсхолдер при загрузке
         )
 
         Text(

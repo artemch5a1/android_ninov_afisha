@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ninovafisha.Domain.Constant
 import com.example.ninovafisha.Domain.Models.Event
 import com.example.ninovafisha.Domain.Models.Profile
@@ -37,6 +38,11 @@ class ViewModelMainScreen: ViewModel() {
 
     private var FiltEvent: List<Event> = listOf()
 
+    fun refresh() {
+        loadEvents()
+        loadTypes()
+    }
+
     init {
         loadEvents()
         loadTypes()
@@ -67,6 +73,11 @@ class ViewModelMainScreen: ViewModel() {
                 _actualState.value = ActualState.Error(ex.message ?: "Ошибка получения данных")
             }
         }
+    }
+
+    fun filtevent(filtString:String){
+        val filtered = FiltEvent.filter { x -> x.title.contains(filtString) || x.desc.contains(filtString) }
+        _events.value = filtered
     }
 
 
