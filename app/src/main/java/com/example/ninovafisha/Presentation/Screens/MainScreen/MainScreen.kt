@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -42,159 +43,86 @@ import androidx.room.util.copy
 import coil.compose.AsyncImage
 import com.example.ninovafisha.Domain.States.ActualState
 import com.example.ninovafisha.Presentation.Screens.Components.EventCard
+import com.example.ninovafisha.Presentation.Screens.Components.TypeBut
 import com.example.ninovafisha.Presentation.Screens.Components.myField
 import com.example.ninovafisha.Presentation.Screens.Components.myFieldSearch
 
-// Или комбинированный импорт:
+
 
 @Composable
 fun MainScreen(controlNav: NavHostController, viewModelMainScreen: ViewModelMainScreen = viewModel()) {
     val textSearch = remember { mutableStateOf("") }
-
     val actualState by viewModelMainScreen.actualState.collectAsState()
     val events = viewModelMainScreen.events.observeAsState(emptyList())
     val types = viewModelMainScreen.types.observeAsState(emptyList())
 
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.TopStart
-    ) {
+
+    Column(modifier = Modifier.fillMaxSize()) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.White) // Фиксированная высота
-                .padding(top = 40.dp)
-                .zIndex(1f), // Гарантирует, что будет поверх других элементов
-            contentAlignment = Alignment.TopEnd
+                .background(Color.White)
+                .zIndex(1f)
         ) {
-            Row(){
-                myFieldSearch(myText = "Найти", text = textSearch.value, onValueChange = {it -> textSearch.value = it; viewModelMainScreen.filtevent(textSearch.value)})
-                Button(
-                    onClick = { viewModelMainScreen.refresh() },
-                    modifier = Modifier
-                        .padding(vertical = 16.dp)
-                        .zIndex(1f),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Gray,
-                        contentColor = Color.White
-                    )
+            Column {
+                Row(
+                    modifier = Modifier.padding(top = 40.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Обновить", fontSize = 18.sp)
+                    myFieldSearch(
+                        myText = "Найти",
+                        text = textSearch.value,
+                        onValueChange = {
+                            textSearch.value = it
+                            viewModelMainScreen.filtevent(it)
+                        },
+                        OnClick = { viewModelMainScreen.refresh() }
+                    )
                 }
-            }
 
-        }
-        Box(
-            modifier = Modifier.padding(top = 34.dp)
-        ){
-            when(actualState){
-                is ActualState.Initialized ->{
-
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(top = 60.dp)
-                    ) {
-                        items(events.value.indices.count()) { index ->
-                            EventCard(event = events.value[index].copy())
-                        }
+                LazyRow(
+                    modifier = Modifier.padding(vertical = 8.dp)
+                ) {
+                    items(types.value.size) { index ->
+                        TypeBut(
+                            typeEv = types.value[index].copy(),
+                            OnClick = {viewModelMainScreen.AddType(types.value[index].id); viewModelMainScreen.filtevent(textSearch.value) },
+                            OnUnclick = {viewModelMainScreen.RemoveType(types.value[index].id);viewModelMainScreen.filtevent(textSearch.value)}
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
                     }
                 }
-                is ActualState.Error ->{
-                    Text(
-                        text = (actualState as ActualState.Error).message,
-                        fontSize = 32.sp,
-                        color = Color.Black,
-                        fontWeight = FontWeight.W800,
-                        modifier = Modifier
-                            .padding(bottom = 16.dp)
-                    )
-                }
-                is ActualState.Loading ->{
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(48.dp), // Размер индикатора
-                        color = Color.Blue, // Цвет индикатора
-                        strokeWidth = 4.dp // Толщина линии
-                    )
-                }
-                is ActualState.Success ->{
+            }
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .weight(1f)
+        ) {
+            when(actualState) {
+                is ActualState.Initialized, is ActualState.Success -> {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        items(events.value.indices.count()) { index ->
+                        items(events.value.size) { index ->
                             EventCard(event = events.value[index].copy())
+                            Spacer(modifier = Modifier.height(8.dp))
                         }
                     }
                 }
+                is ActualState.Error -> {
+                    Text(
+                        text = (actualState as ActualState.Error).message,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+                is ActualState.Loading -> {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
             }
         }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /*var greetingText by remember { mutableStateOf<String?>(null) }
-
-
-
-    LaunchedEffect(Unit) {
-        val part1 = viewModelMainScreen.GetName() ?: ""
-        greetingText = part1
-    }*/
-
-    /*Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-
-            Text(
-                text = "Привет, " + greetingText,
-                fontSize = 32.sp,
-                color = Color.Black,
-                fontWeight = FontWeight.W800,
-                modifier = Modifier
-                    .padding(bottom = 16.dp)
-                    .align(alignment = Alignment.CenterHorizontally)
-            )
-
-            Button(
-                onClick = {
-                    controlNav.navigate("sigin")
-                    viewModelMainScreen.GetOut()
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Gray,
-                    contentColor = Color.White
-                ),
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            ) {
-
-                Text(text = "Назад", fontSize = 18.sp)
-            }
-        }
-    }*/
+    }
 }

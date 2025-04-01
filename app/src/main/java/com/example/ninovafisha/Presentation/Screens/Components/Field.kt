@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -79,7 +80,7 @@ fun myFieldPass(myText: String, text: String, onValueChange: (String) -> Unit) {
 }
 
 @Composable
-fun myFieldSearch(myText: String, text: String, onValueChange: (String) -> Unit) {
+fun myFieldSearch(myText: String, text: String, onValueChange: (String) -> Unit, OnClick: () -> Unit) {
     var passSee by remember { mutableStateOf(false) }
 
     OutlinedTextField(
@@ -92,6 +93,15 @@ fun myFieldSearch(myText: String, text: String, onValueChange: (String) -> Unit)
         value = text,
         onValueChange = onValueChange,
         label = { Text(myText) },
-        shape = RoundedCornerShape(15.dp)
+        shape = RoundedCornerShape(15.dp),
+        modifier = Modifier.fillMaxWidth(),
+        trailingIcon = {
+            IconButton(onClick = OnClick) {
+                Icon(
+                    imageVector = Icons.Default.Refresh,
+                    contentDescription = "перезагрузка"
+                )
+            }
+        }
     )
 }

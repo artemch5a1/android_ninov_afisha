@@ -37,6 +37,14 @@ class ViewModelMainScreen: ViewModel() {
     val events: LiveData<List<Event>> get() = _events
 
     private var FiltEvent: List<Event> = listOf()
+    private var filtType: MutableList<Int> = mutableListOf()
+
+    fun RemoveType(id:Int){
+        filtType.remove(id)
+    }
+    fun AddType(id:Int){
+        filtType.add(id)
+    }
 
     fun refresh() {
         loadEvents()
@@ -76,8 +84,15 @@ class ViewModelMainScreen: ViewModel() {
     }
 
     fun filtevent(filtString:String){
-        val filtered = FiltEvent.filter { x -> x.title.contains(filtString) || x.desc.contains(filtString) }
-        _events.value = filtered
+        if(filtType.isNotEmpty()){
+            var filtered = FiltEvent.filter { x -> x.title.contains(filtString) || x.desc.contains(filtString) }
+            filtered = filtered.filter { x -> filtType.contains(x.typeEvent)}
+            _events.value = filtered
+        }
+        else{
+            val filtered = FiltEvent.filter { x -> x.title.contains(filtString) || x.desc.contains(filtString) }
+            _events.value = filtered
+        }
     }
 
 
