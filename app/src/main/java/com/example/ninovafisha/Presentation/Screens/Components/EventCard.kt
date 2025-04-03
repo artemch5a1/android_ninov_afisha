@@ -1,9 +1,13 @@
 package com.example.ninovafisha.Presentation.Screens.Components
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,7 +24,10 @@ import com.example.ninovafisha.R
 
 @Composable
 fun EventCard(event: Event?){
-    Column(modifier = Modifier.padding(16.dp).padding(top = 50.dp).padding(end = 16.dp)) {
+    Column(modifier = Modifier
+        .padding(16.dp)
+        .padding(top = 50.dp)
+        .padding(end = 16.dp)) {
 
         val imageModel = event?.image.takeIf { !it.isNullOrEmpty() }
             ?: R.drawable.empty // Запасное изображение
@@ -48,13 +55,44 @@ fun EventCard(event: Event?){
         )
         Text(
             text = "" + event?.desc,
-            fontSize = 10.sp,
+            fontSize = 15.sp,
             color = Color.Black,
             fontWeight = FontWeight.W800,
             modifier = Modifier
                 .padding(bottom = 16.dp)
                 .align(alignment = Alignment.Start)
         )
+        Row(){
+            Button(
+                onClick = {
 
+                },
+                modifier = Modifier,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Gray,
+                    contentColor = Color.White
+                )
+            ) {
+                Text("Подробнее", fontSize = 15.sp)
+            }
+            Spacer(modifier = Modifier.padding(10.dp))
+            Text(
+                text = "" + event?.date,
+                fontSize = 15.sp,
+                color = Color.Black,
+                fontWeight = FontWeight.W800,
+                modifier = Modifier
+                    .padding(bottom = 16.dp).align(Alignment.CenterVertically)
+            )
+            Spacer(modifier = Modifier.padding(10.dp))
+            Text(
+                text = "Билет от: " + event?.cost?.toInt() + " рублей",
+                fontSize = 15.sp,
+                color = Color.Black,
+                fontWeight = FontWeight.W800,
+                modifier = Modifier
+                    .padding(bottom = 16.dp).align(Alignment.CenterVertically)
+            )
+        }
     }
 }

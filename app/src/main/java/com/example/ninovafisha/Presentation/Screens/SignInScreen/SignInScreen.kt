@@ -35,8 +35,6 @@ fun SigninScreen(controlNav: NavHostController, signInViewModel: SignInViewModel
     val actualState by signInViewModel.actualState.collectAsState()
     val signinState = signInViewModel.signInState
 
-    var email by remember { mutableStateOf("") }
-    var pass by remember { mutableStateOf("") }
 
     Box(modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center) {

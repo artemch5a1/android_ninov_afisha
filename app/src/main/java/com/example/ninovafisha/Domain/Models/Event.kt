@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 data class Event (
     val title:String,
     val desc:String,
-    val image:String,
+    val image:String?,
     @SerialName("type_event")
     val typeEvent:Int,
     @SerialName("date_start")

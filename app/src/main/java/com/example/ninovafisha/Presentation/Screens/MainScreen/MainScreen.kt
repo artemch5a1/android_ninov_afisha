@@ -1,5 +1,6 @@
 package com.example.ninovafisha.Presentation.Screens.MainScreen
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -46,7 +47,7 @@ import com.example.ninovafisha.Presentation.Screens.Components.EventCard
 import com.example.ninovafisha.Presentation.Screens.Components.TypeBut
 import com.example.ninovafisha.Presentation.Screens.Components.myField
 import com.example.ninovafisha.Presentation.Screens.Components.myFieldSearch
-
+import okhttp3.internal.wait
 
 
 @Composable
@@ -55,7 +56,15 @@ fun MainScreen(controlNav: NavHostController, viewModelMainScreen: ViewModelMain
     val actualState by viewModelMainScreen.actualState.collectAsState()
     val events = viewModelMainScreen.events.observeAsState(emptyList())
     val types = viewModelMainScreen.types.observeAsState(emptyList())
+    val eventsState by viewModelMainScreen.eventsState.collectAsState()
 
+
+
+    when(eventsState){
+        true, false ->{
+            viewModelMainScreen.filtevent(textSearch.value)
+        }
+    }
 
     Column(modifier = Modifier.fillMaxSize()) {
         Box(
@@ -76,7 +85,8 @@ fun MainScreen(controlNav: NavHostController, viewModelMainScreen: ViewModelMain
                             textSearch.value = it
                             viewModelMainScreen.filtevent(it)
                         },
-                        OnClick = { viewModelMainScreen.refresh() }
+                        OnClick = {viewModelMainScreen.RememberFiltState(textSearch.value);
+                            viewModelMainScreen.refresh()}
                     )
                 }
 

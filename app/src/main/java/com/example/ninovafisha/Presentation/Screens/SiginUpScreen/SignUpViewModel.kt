@@ -50,6 +50,7 @@ class SignUpViewModel: ViewModel() {
                                 supabase.from("Profile").insert(profile)
                                 _actualState.value = ActualState.Success("")
                             }
+                            Constant.supabase.auth.signOut()
                         }
                         catch (ex: Exception){
                             _actualState.value = ActualState.Error(ex.message ?: "Ошибка получения данных")
