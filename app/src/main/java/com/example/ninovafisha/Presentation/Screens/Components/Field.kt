@@ -3,6 +3,7 @@ package com.example.ninovafisha.Presentation.Screens.Components
 import android.text.method.PasswordTransformationMethod
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
@@ -40,7 +41,7 @@ fun myField(myText: String, text: String, onValueChange: (String) -> Unit){
         onValueChange = onValueChange,
         label = { Text(myText) },
         shape = RoundedCornerShape(15.dp),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.padding(horizontal = 0.05f.dp)
     )
 }
 
@@ -59,7 +60,7 @@ fun myFieldPass(myText: String, text: String, onValueChange: (String) -> Unit) {
         onValueChange = onValueChange,
         label = { Text(myText) },
         shape = RoundedCornerShape(15.dp),
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.padding(horizontal = 0.5f.dp),
         visualTransformation = if (passSee) {
             VisualTransformation.None
         } else {

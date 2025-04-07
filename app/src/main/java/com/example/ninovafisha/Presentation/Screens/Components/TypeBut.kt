@@ -27,22 +27,17 @@ import com.example.ninovafisha.Domain.Models.typeEvent
 import com.example.ninovafisha.R
 
 @Composable
-fun TypeBut(typeEv: typeEvent?, OnClick: () -> Unit, OnUnclick: () -> Unit) {
-    var isSelected by remember { mutableStateOf(false) }
-
+fun TypeBut(typeEv: typeEvent?, isSelected: Boolean, OnClick: () -> Unit) {
+    var isSelectesNow by remember{ mutableStateOf(isSelected) }
     Button(
         onClick = {
-            if (isSelected) {
-                OnUnclick()
-            } else {
-                OnClick()
-            }
-            isSelected = !isSelected
+            OnClick()
+            isSelectesNow = !isSelectesNow
         },
         modifier = Modifier
             .padding(vertical = 16.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = if (isSelected) Color.Blue else Color.Gray,
+            containerColor = if (isSelectesNow) Color.Blue else Color.Gray,
             contentColor = Color.White
         )
     ) {

@@ -1,34 +1,24 @@
-package com.example.ninovafisha.Presentation.Screens.MainScreen
+package com.example.ninovafisha.Presentation.Screens.ListEventsScreen
 
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ninovafisha.Domain.Constant
 import com.example.ninovafisha.Domain.Models.Event
-import com.example.ninovafisha.Domain.Models.Profile
 import com.example.ninovafisha.Domain.Models.typeEvent
 import com.example.ninovafisha.Domain.States.ActualState
 import com.example.ninovafisha.Domain.States.FilterState
 import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.postgrest.postgrest
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import okhttp3.internal.wait
 
 
-class ViewModelMainScreen: ViewModel() {
+class ViewModelListEventsScreen: ViewModel() {
 
     /*viewModelScope.launch {
         val prof = Constant.supabase.postgrest.from("public", "Profile").select().decodeList<Profile>()
@@ -48,23 +38,32 @@ class ViewModelMainScreen: ViewModel() {
     val eventsState: StateFlow<Boolean> = _eventsState.asStateFlow()
 
 
-
     private var FiltEvent = MutableLiveData<List<Event>>()
     val filtEvent: LiveData<List<Event>> get() = FiltEvent
 
-    private var filtType: MutableList<Int> = mutableListOf()
+    private var _filtType: MutableList<Int> = mutableListOf()
+    val filtType: List<Int> get() = _filtType
+
+    fun toggleType(typeId: Int, textSearch: String) {
+        if (_filtType.contains(typeId)) {
+            _filtType.remove(typeId)
+        } else {
+            _filtType.add(typeId)
+        }
+        filtevent(textSearch)
+    }
 
     private var filterState = mutableStateOf(FilterState())
 
 
     fun RememberFiltState(textSearch:String){
-        filterState.value = filterState.value.copy(textSearch = textSearch, types = filtType)
+        filterState.value = filterState.value.copy(textSearch = textSearch, types = _filtType)
     }
     fun RemoveType(id:Int){
-        filtType.remove(id)
+        _filtType.remove(id)
     }
     fun AddType(id:Int){
-        filtType.add(id)
+        _filtType.add(id)
     }
     fun refresh() {
         loadEvents()
@@ -106,9 +105,9 @@ class ViewModelMainScreen: ViewModel() {
     }
 
     fun filtevent(filtString:String){
-        if(filtType.isNotEmpty()){
+        if(_filtType.isNotEmpty()){
             var filtered = FiltEvent.value?.filter { x -> x.title.contains(filtString) || x.desc.contains(filtString) }
-            filtered = filtered?.filter { x -> filtType.contains(x.typeEvent)}
+            filtered = filtered?.filter { x -> _filtType.contains(x.typeEvent)}
             _events.value = filtered ?: emptyList()
         }
         else{
@@ -118,7 +117,7 @@ class ViewModelMainScreen: ViewModel() {
     }
 
     fun filtevent(){
-        if(filtType.isNotEmpty()){
+        if(_filtType.isNotEmpty()){
             var filtered = FiltEvent.value?.filter { x -> x.title.contains(filterState.value.textSearch) || x.desc.contains(filterState.value.textSearch) }
             filtered = filtered?.filter { x -> filterState.value.types.contains(x.typeEvent)}
             _events.value = filtered ?: emptyList()

@@ -118,7 +118,7 @@ fun SigninScreen(controlNav: NavHostController, signInViewModel: SignInViewModel
                             )
 
                 }
-                is ActualState.Success ->{
+                is ActualState.Success -> {
                     controlNav.navigate("main")
                 }
             }

@@ -53,7 +53,7 @@ class SignInViewModel: ViewModel() {
                     _actualState.value = ActualState.Error(_ex.errorDescription?: "Ошибка получения данных")
                 }
                 catch(ex: TimeoutCancellationException){
-                    _actualState.value = ActualState.Error("Превышено время ожидания: ${ex.message}")
+                    _actualState.value = ActualState.Error("${ex.message}")
                 }
                 catch (ex: Exception) {
                     Log.e("SignInViewModel", "Неожиданная ошибка", ex)
