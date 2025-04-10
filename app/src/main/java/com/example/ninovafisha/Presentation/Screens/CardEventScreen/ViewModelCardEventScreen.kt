@@ -13,6 +13,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class ViewModelCardEventScreen(): ViewModel() {
+
+
     private val _actualState = MutableStateFlow<ActualState>(ActualState.Initialized)
     val actualState: StateFlow<ActualState> = _actualState.asStateFlow()
 

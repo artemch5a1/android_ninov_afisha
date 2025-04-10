@@ -122,7 +122,17 @@ fun SigninScreen(controlNav: NavHostController, signInViewModel: SignInViewModel
                     controlNav.navigate("main")
                 }
             }
-
+            Spacer(modifier = Modifier.padding(10.dp))
+            Text(
+                text = "Продолжить без регистрации",
+                fontSize = 16.sp,
+                color = Color.Black,
+                fontWeight = FontWeight.W400,
+                modifier = Modifier
+                    .padding(bottom = 16.dp)
+                    .align(Alignment.CenterHorizontally)
+                    .clickable { controlNav.navigate("main") }
+            )
         }
     }
 }

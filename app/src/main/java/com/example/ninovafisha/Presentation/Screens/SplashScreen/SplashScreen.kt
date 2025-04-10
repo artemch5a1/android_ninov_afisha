@@ -33,7 +33,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.ninovafisha.Domain.Constant
 import com.example.ninovafisha.R
+import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.delay
 
 @SuppressLint("UnusedBoxWithConstraintsScope")
@@ -43,22 +45,24 @@ fun SplashScreen(controlNav: NavHostController) {
 
     // Запуск анимации
     LaunchedEffect(Unit) {
+        // 1. Анимация загрузки
         rotation.animateTo(
             targetValue = 360f,
             animationSpec = repeatable(
-                iterations = 2, // Количество повторений
+                iterations = 2,
                 animation = tween(durationMillis = 878, easing = LinearEasing),
                 repeatMode = RepeatMode.Restart
             )
         )
-        delay(1500L)
-        controlNav.navigate("sigin"){
-            popUpTo("splash") {
-                inclusive = true
-            }
+
+        // 2. Задержка для демонстрации анимации
+        delay(2500L)
+
+        // 4. Навигация в зависимости от результата
+            controlNav.navigate("sigin") {
+                popUpTo("splash") { inclusive = true }
         }
     }
-
 
 
     BoxWithConstraints {
@@ -78,7 +82,8 @@ fun SplashScreen(controlNav: NavHostController) {
                 Image(painter = painterResource(id = R.drawable.logo),
                     contentDescription = "Logo",
                     modifier = Modifier
-                        .size(200.dp).graphicsLayer{
+                        .size(200.dp)
+                        .graphicsLayer {
                             rotationZ = rotation.value // Применяем анимацию вращения
                         })
 

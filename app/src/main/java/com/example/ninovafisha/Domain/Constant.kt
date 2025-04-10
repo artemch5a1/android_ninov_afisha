@@ -13,7 +13,10 @@ object Constant {
         supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhraGtpeGNyZG5seGpyc2xiYm9kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk3ODg3MjQsImV4cCI6MjA1NTM2NDcyNH0.M2q0DDenKPFWQK3NiyOQoGtwbKa9QOOkPBMbBnEUMVE"
     ) {
         install(Postgrest)
-        install(Auth)
+        install(Auth){
+            alwaysAutoRefresh = false // Отключаем авто-обновление сессии
+            autoLoadFromStorage = false
+        }
         install(Storage)
     }
 }

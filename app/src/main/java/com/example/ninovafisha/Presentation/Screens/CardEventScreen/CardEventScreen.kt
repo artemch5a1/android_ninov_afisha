@@ -37,7 +37,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.example.ninovafisha.Domain.Constant
 import com.example.ninovafisha.R
+import io.github.jan.supabase.auth.auth
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -150,24 +152,30 @@ fun CardEventScreen(controlNav: NavController, eventId:String, viewModelCardEven
             Spacer(modifier = Modifier.height(8.dp))
 
             // Цена ("2500.0 P" → "2 500 ₽")
-            Button(
-                onClick = { /* Действие при нажатии */ },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Gray,
-                    contentColor = Color.White
-                ),
-                elevation = ButtonDefaults.buttonElevation(
-                    defaultElevation = 4.dp,
-                    pressedElevation = 2.dp
-                ),
-                modifier = Modifier.padding(top = 8.dp)
-            ) {
-                Text(
-                    text = formatPrice(eventCard.cost),
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        fontWeight = FontWeight.Bold
-                    )
-                )
+            when{
+                Constant.supabase.auth.currentUserOrNull() != null -> {
+                    var user = Constant.supabase.auth.currentUserOrNull()
+                    println("Current user: ${user?.id}")
+                    Button(
+                        onClick = { /* Действие при нажатии */ },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Gray,
+                            contentColor = Color.White
+                        ),
+                        elevation = ButtonDefaults.buttonElevation(
+                            defaultElevation = 4.dp,
+                            pressedElevation = 2.dp
+                        ),
+                        modifier = Modifier.padding(top = 8.dp)
+                    ) {
+                        Text(
+                            text = formatPrice(eventCard.cost),
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+                    }
+                }
             }
         }
     }
