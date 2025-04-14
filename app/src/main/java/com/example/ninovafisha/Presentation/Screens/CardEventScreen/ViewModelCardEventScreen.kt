@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class ViewModelCardEventScreen(): ViewModel() {
+class ViewModelCardEventScreen(eventId:String): ViewModel() {
 
 
     private val _actualState = MutableStateFlow<ActualState>(ActualState.Initialized)
@@ -21,6 +21,9 @@ class ViewModelCardEventScreen(): ViewModel() {
     private val _eventCard = mutableStateOf(EventCard(id = ""))
     val eventCard: EventCard get() = _eventCard.value
 
+    init {
+        loadEvent(eventId)
+    }
 
     fun loadEvent(eventId:String){
         _actualState.value = ActualState.Loading

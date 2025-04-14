@@ -45,11 +45,9 @@ import java.util.Date
 import java.util.Locale
 
 @Composable
-fun CardEventScreen(controlNav: NavController, eventId:String, viewModelCardEventScreen: ViewModelCardEventScreen = viewModel()
+fun CardEventScreen(controlNav: NavController, eventId:String, viewModelCardEventScreen: ViewModelCardEventScreen = viewModel{ ViewModelCardEventScreen(eventId) }
 ){
-    LaunchedEffect(eventId) {
-        viewModelCardEventScreen.loadEvent(eventId)
-    }
+
 
     val actualState by viewModelCardEventScreen.actualState.collectAsState()
     val eventCard = viewModelCardEventScreen.eventCard
@@ -177,6 +175,7 @@ fun CardEventScreen(controlNav: NavController, eventId:String, viewModelCardEven
                     }
                 }
             }
+
         }
     }
 }

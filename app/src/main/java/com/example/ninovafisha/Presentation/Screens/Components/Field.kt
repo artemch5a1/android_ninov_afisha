@@ -1,6 +1,7 @@
 package com.example.ninovafisha.Presentation.Screens.Components
 
 import android.text.method.PasswordTransformationMethod
+import android.widget.AutoCompleteTextView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -44,6 +45,7 @@ fun myField(myText: String, text: String, onValueChange: (String) -> Unit){
         modifier = Modifier.padding(horizontal = 0.05f.dp)
     )
 }
+
 
 @Composable
 fun myFieldPass(myText: String, text: String, onValueChange: (String) -> Unit) {

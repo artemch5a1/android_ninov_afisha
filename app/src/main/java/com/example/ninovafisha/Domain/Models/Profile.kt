@@ -9,5 +9,6 @@ data class Profile (
     val surname: String,
     @SerialName("datebirth")
     val datebith:String?,
-    val id:String?
+    val id:String?,
+    val role:Int = 1
 )

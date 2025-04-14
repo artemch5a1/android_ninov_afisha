@@ -79,7 +79,7 @@ class ViewModelListEventsScreen: ViewModel() {
         _actualState.value = ActualState.Loading
         viewModelScope.launch {
             try{
-                FiltEvent.value = Constant.supabase.postgrest.from("Events").select().decodeList()
+                FiltEvent.value = Constant.supabase.postgrest.from("Events").select{ filter { eq("hide", value = true) }}.decodeList()
                 _eventsState.value = !_eventsState.value
                 _events.value = FiltEvent.value
                 _actualState.value = ActualState.Initialized

@@ -82,6 +82,8 @@ fun SignUpScreen(controlNav: NavHostController, signUpViewModel: SignUpViewModel
                 text = signupState.surname,
                 onValueChange = {it -> signUpViewModel.updateSignup(signupState.copy(surname = it))})
 
+
+
             myFieldPass(myText = "Введите пароль",
                 text = signupState.password,
                 onValueChange = {it -> signUpViewModel.updateSignup(signupState.copy(password = it))})
