@@ -7,7 +7,9 @@ import com.example.ninovafisha.Domain.Constant
 import com.example.ninovafisha.Domain.Models.EventCard
 import com.example.ninovafisha.Domain.States.ActualState
 import com.example.ninovafisha.Domain.States.EventState
+import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -48,7 +50,23 @@ class ViewModelUpdateOrDelete(id:String?): ViewModel() {
         }
     }
 
-    fun updateEvent(newCard: EventCard){
+    fun updateEventInfo(newCard: EventCard){
         _eventCard.value = newCard
+    }
+
+    fun updateEvent(){
+        _eventState.value = EventState.Loading
+        viewModelScope.launch {
+            try {
+                Constant.supabase.postgrest.from("Events").update(eventCard){filter { eq("id", eventCard.id) }}
+                _eventState.value = EventState.Updated("")
+            }
+            catch (e:AuthRestException){
+                _eventState.value = EventState.Error("${e.errorDescription} ")
+            }
+            catch (e:Exception){
+                _eventState.value = EventState.Error("${e.message} ")
+            }
+        }
     }
 }

@@ -5,11 +5,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.ninovafisha.Presentation.Screens.CardEventScreen.CardEventScreen
-import com.example.ninovafisha.Presentation.Screens.CardEventScreen.ViewModelCardEventScreen
 import com.example.ninovafisha.Presentation.Screens.ListEventsScreen.ListEventsScreen
 import com.example.ninovafisha.Presentation.Screens.SiginUpScreen.SignUpScreen
 import com.example.ninovafisha.Presentation.Screens.SignInScreen.SigninScreen
 import com.example.ninovafisha.Presentation.Screens.SplashScreen.SplashScreen
+import com.example.ninovafisha.Presentation.Screens.UpdateOrAddScreen.UpdateOrAddScreen
 
 @Composable
 fun NavHost() {
@@ -33,6 +33,10 @@ fun NavHost() {
         composable("eventCard/{eventId}"){
             val eventId = it.arguments?.getString("eventId") ?: ""
             CardEventScreen(controlNav = controlNav, eventId = eventId)
+        }
+        composable("UpdateOrAdd/{eventId}"){
+            val eventId = it.arguments?.getString("eventId")
+            UpdateOrAddScreen(controlNav = controlNav, id = eventId)
         }
     }
 

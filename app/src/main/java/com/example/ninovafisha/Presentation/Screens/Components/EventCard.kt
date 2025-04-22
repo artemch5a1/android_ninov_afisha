@@ -100,7 +100,9 @@ fun EventCard(event: Event?, controlNav: NavHostController, isAuthor:Boolean, is
         Row(){
             Button(
                 onClick = {
-                    controlNav.navigate("eventCard/${event?.id}")
+                    controlNav.navigate("eventCard/${event?.id}"){
+                        popUpTo("main") { inclusive = true }
+                    }
                 },
                 modifier = Modifier,
                 colors = ButtonDefaults.buttonColors(

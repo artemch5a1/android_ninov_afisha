@@ -3,11 +3,16 @@ package com.example.ninovafisha.Presentation.Screens.Components
 import android.text.method.PasswordTransformationMethod
 import android.widget.AutoCompleteTextView
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -44,6 +49,52 @@ fun myField(myText: String, text: String, onValueChange: (String) -> Unit){
         shape = RoundedCornerShape(15.dp),
         modifier = Modifier.padding(horizontal = 0.05f.dp)
     )
+}
+
+@Composable
+fun DropdownField(
+    label: String,
+    items: List<String>,
+    selectedItem: String,
+    onItemSelected: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Box(modifier = modifier) {
+        OutlinedTextField(
+            value = selectedItem,
+            onValueChange = {},  // Запрещаем ручное редактирование
+            readOnly = true,     // Только выбор из списка
+            label = { Text(label) },
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color.White,
+                unfocusedContainerColor = Color.White,
+                unfocusedIndicatorColor = Color.White,
+                focusedIndicatorColor = Color.White,
+            ),
+            shape = RoundedCornerShape(15.dp),
+            modifier = Modifier
+                .padding(horizontal = 0.05f.dp)
+                .clickable { expanded = true }
+        )
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.fillMaxWidth(0.9f)
+        ) {
+            items.forEach { item ->
+                DropdownMenuItem(
+                    text = { Text(item) },
+                    onClick = {
+                        onItemSelected(item)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
 }
 
 @Composable

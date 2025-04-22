@@ -9,6 +9,7 @@ import com.example.ninovafisha.Domain.Constant.supabase
 import com.example.ninovafisha.Domain.States.ActualState
 import com.example.ninovafisha.Domain.Models.EventCard
 import com.example.ninovafisha.Domain.States.EventState
+import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.postgrest
@@ -29,8 +30,14 @@ class ViewModelCardEventScreen(eventId:String): ViewModel() {
     private val _eventCard = mutableStateOf(EventCard(id = ""))
     val eventCard: EventCard get() = _eventCard.value
 
+    private val _user = mutableStateOf<String?>(null)
+    val user:String? get() = _user.value
+
     init {
         loadEvent(eventId)
+        viewModelScope.launch {
+            _user.value = Constant.supabase.auth.currentUserOrNull()?.id
+        }
     }
 
     fun DeleteLogic(eventId:String){

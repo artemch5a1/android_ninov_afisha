@@ -1,6 +1,7 @@
 package com.example.ninovafisha.Presentation.Screens.CardEventScreen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,9 +14,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,6 +39,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -57,6 +62,7 @@ fun CardEventScreen(controlNav: NavController, eventId:String, viewModelCardEven
     val actualState by viewModelCardEventScreen.actualState.collectAsState()
     val eventState by viewModelCardEventScreen.eventState.collectAsState()
     val eventCard = viewModelCardEventScreen.eventCard
+    val user = viewModelCardEventScreen.user
 
     /*val formattedDate = remember(eventCard.date) {
         SimpleDateFormat("d MMMM yyyy 'года'", Locale("ru"))
@@ -114,7 +120,7 @@ fun CardEventScreen(controlNav: NavController, eventId:String, viewModelCardEven
         is ActualState.Success, ActualState.Initialized ->{
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxSize()
             ) {
                 // Блок с изображением и наложением (только название, дата и цена)
                 Box(
@@ -129,6 +135,7 @@ fun CardEventScreen(controlNav: NavController, eventId:String, viewModelCardEven
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
                     )
+
 
                     // Градиент поверх изображения
                     Box(
@@ -210,6 +217,7 @@ fun CardEventScreen(controlNav: NavController, eventId:String, viewModelCardEven
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
+                        .weight(1f)
                 ) {
                     // Строка с жанром и возрастом
                     Row(
@@ -274,23 +282,45 @@ fun CardEventScreen(controlNav: NavController, eventId:String, viewModelCardEven
                     Spacer(modifier = Modifier.padding(15.dp))
                     when(eventState){
                         is EventState.Initialized ->{
-                            Button(
-                                onClick = {
-                                    viewModelCardEventScreen.DeleteLogic(eventId)
-                                },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color.Gray,
-                                    contentColor = Color.White
-                                ),
-                                modifier = Modifier.align(Alignment.CenterHorizontally)
-                            ) {
+                            if(eventCard.author == user){
+                                Row {
+                                    Button(
+                                        onClick = {
+                                            viewModelCardEventScreen.DeleteLogic(eventId)
+                                        },
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = Color.Gray,
+                                            contentColor = Color.White
+                                        ),
+                                        modifier = Modifier
+                                    ) {
 
-                                Text(text = "Удалить", fontSize = 18.sp)
+                                        Text(text = "Удалить", fontSize = 18.sp)
+                                    }
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Button(
+                                        onClick = {
+                                            controlNav.navigate("UpdateOrAdd/${eventId}"){
+                                                popUpTo("UpdateOrAdd/${eventId}") { inclusive = true }
+                                            }
+                                        },
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = Color.Gray,
+                                            contentColor = Color.White
+                                        ),
+                                        modifier = Modifier
+                                    ) {
+
+                                        Text(text = "Изменить", fontSize = 18.sp)
+                                    }
+                                }
                             }
                         }
                         is EventState.Loading -> {
                             CircularProgressIndicator(
-                                modifier = Modifier.size(48.dp).align(Alignment.CenterHorizontally), // Размер индикатора
+                                modifier = Modifier
+                                    .size(48.dp)
+                                    .align(Alignment.CenterHorizontally), // Размер индикатора
                                 color = Color.Blue, // Цвет индикатора
                                 strokeWidth = 4.dp // Толщина линии
                             )
@@ -329,6 +359,27 @@ fun CardEventScreen(controlNav: NavController, eventId:String, viewModelCardEven
                             )
                         }
                     }
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.White)
+                        .zIndex(1f)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ExitToApp,
+                        contentDescription = "Выход",
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(16.dp)
+                            .align(Alignment.TopStart)
+                            .clickable {
+                                controlNav.navigate("main"){
+                                    popUpTo("eventCard/${eventId}")
+                                }
+                            },
+                        tint = Color.Black
+                    )
                 }
             }
         }
