@@ -46,6 +46,28 @@ fun myField(myText: String, text: String, onValueChange: (String) -> Unit){
     )
 }
 
+@Composable
+fun myFieldCost(myText: String, text: String, onValueChange: (String) -> Unit){
+    /*var text by remember { mutableStateOf("") }*/
+    OutlinedTextField(
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.White,
+            unfocusedContainerColor = Color.White,
+            unfocusedIndicatorColor = Color.White,
+            focusedIndicatorColor = Color.White,
+        ),
+        value = text,
+        onValueChange = { newValue ->
+            // Фильтруем ввод: разрешаем только цифры и знак минуса в начале
+            val filteredValue = newValue.filter { it.isDigit() || it == '.'}
+            onValueChange(filteredValue)
+        },
+        label = { Text(myText) },
+        shape = RoundedCornerShape(15.dp),
+        modifier = Modifier.padding(horizontal = 0.05f.dp)
+    )
+}
+
 
 @Composable
 fun myFieldPass(myText: String, text: String, onValueChange: (String) -> Unit) {
