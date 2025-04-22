@@ -1,6 +1,7 @@
 package com.example.ninovafisha.Presentation.Screens.ListEventsScreen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,7 +13,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -41,7 +46,7 @@ fun ListEventsScreen(controlNav: NavHostController, viewModelListEventsScreen: V
     val types = viewModelListEventsScreen.types.observeAsState(emptyList())
     val eventsState by viewModelListEventsScreen.eventsState.collectAsState()
     val filtType = viewModelListEventsScreen.filtType
-
+    val user = viewModelListEventsScreen.user
 
     when(eventsState){
         true, false ->{
@@ -99,7 +104,7 @@ fun ListEventsScreen(controlNav: NavHostController, viewModelListEventsScreen: V
                         modifier = Modifier.fillMaxSize()
                     ) {
                         items(events.value.size) { index ->
-                            EventCard(event = events.value[index].copy(), controlNav)
+                            EventCard(event = events.value[index].copy(), controlNav, isAuthor = events.value[index].author == user, isAdmin = false)
                             Spacer(modifier = Modifier.height(8.dp))
                         }
                     }
@@ -115,6 +120,28 @@ fun ListEventsScreen(controlNav: NavHostController, viewModelListEventsScreen: V
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
+            }
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White)
+                .zIndex(1f)
+        ) {
+            Icon(
+                imageVector = Icons.Default.ExitToApp,
+                contentDescription = "Выход",
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(16.dp)
+                    .align(Alignment.TopStart)
+                    .clickable {
+                        viewModelListEventsScreen.GetOut(controlNav)
+                    },
+                tint = Color.Black
+            )
+            Column {
+
             }
         }
     }

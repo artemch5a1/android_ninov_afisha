@@ -14,7 +14,7 @@ object Constant {
     ) {
         install(Postgrest)
         install(Auth){
-            alwaysAutoRefresh = false // Отключаем авто-обновление сессии
+            alwaysAutoRefresh = false
             autoLoadFromStorage = false
         }
         install(Storage)

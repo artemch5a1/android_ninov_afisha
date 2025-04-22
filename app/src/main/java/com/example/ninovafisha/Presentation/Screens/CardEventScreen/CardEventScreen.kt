@@ -10,9 +10,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,6 +41,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.ninovafisha.Domain.Constant
+import com.example.ninovafisha.Domain.States.ActualState
+import com.example.ninovafisha.Domain.States.EventState
 import com.example.ninovafisha.R
 import io.github.jan.supabase.auth.auth
 import java.text.SimpleDateFormat
@@ -50,6 +55,7 @@ fun CardEventScreen(controlNav: NavController, eventId:String, viewModelCardEven
 
 
     val actualState by viewModelCardEventScreen.actualState.collectAsState()
+    val eventState by viewModelCardEventScreen.eventState.collectAsState()
     val eventCard = viewModelCardEventScreen.eventCard
 
     /*val formattedDate = remember(eventCard.date) {
@@ -78,104 +84,253 @@ fun CardEventScreen(controlNav: NavController, eventId:String, viewModelCardEven
         }
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(0.5f)// Вы можете настроить высоту по своему усмотрению
-    ) {
-        // Фоновое изображение
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            // 1. Сначала изображение
-            AsyncImage(
-                model = eventCard.image.takeIf { !it.isNullOrEmpty() } ?: R.drawable.empty,
-                contentDescription = "Изображение события",
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
+    when(actualState){
+        is ActualState.Error ->{
+            Text(
+                text = (actualState as ActualState.Error).message  ?: "",
+                color = Color.White,
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 10.sp,
+                    shadow = Shadow(
+                        color = Color.Black.copy(alpha = 0.5f),
+                        offset = Offset(1f, 1f),
+                        blurRadius = 4f
+                    )
+                )
             )
-
-            // 2. Затем градиент поверх изображения
+        }
+        is ActualState.Loading -> {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(
-                                Color.Transparent,
-                                Color.Black.copy(alpha = 0.8f) // Корректное значение alpha (0-1)
-                            ),
-                            startY = 0f,
-                            endY = 1000f // Фиксированное значение вместо Infinity для лучшей производительности
-                        )
-                    )
-            )
+            ){
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+
         }
-
-        // Текст поверх изображения
-        Column(
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(16.dp)
-        ) {
-
-            Text(
-                text = formatDate(eventCard.title), // Функция форматирования ниже
-                color = Color.White,
-                style = MaterialTheme.typography.titleLarge.copy(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 30.sp,
-                    shadow = Shadow(
-                        color = Color.Black.copy(alpha = 0.5f),
-                        offset = Offset(1f, 1f),
-                        blurRadius = 4f
+        is ActualState.Success, ActualState.Initialized ->{
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                // Блок с изображением и наложением (только название, дата и цена)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.5f)
+                ) {
+                    // Фоновое изображение
+                    AsyncImage(
+                        model = eventCard.image.takeIf { !it.isNullOrEmpty() } ?: R.drawable.empty,
+                        contentDescription = "Изображение события",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
                     )
-                )
-            )
 
-            // Дата (формат "2025-05-02" → "2 мая 2025")
-            Text(
-                text = formatDate(eventCard.date), // Функция форматирования ниже
-                color = Color.White,
-                style = MaterialTheme.typography.titleLarge.copy(
-                    fontWeight = FontWeight.Bold,
-                    shadow = Shadow(
-                        color = Color.Black.copy(alpha = 0.5f),
-                        offset = Offset(1f, 1f),
-                        blurRadius = 4f
+                    // Градиент поверх изображения
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                brush = Brush.verticalGradient(
+                                    colors = listOf(
+                                        Color.Transparent,
+                                        Color.Black.copy(alpha = 0.8f)
+                                    ),
+                                    startY = 0f,
+                                    endY = 1000f
+                                )
+                            )
                     )
-                )
-            )
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Цена ("2500.0 P" → "2 500 ₽")
-            when{
-                Constant.supabase.auth.currentUserOrNull() != null -> {
-                    var user = Constant.supabase.auth.currentUserOrNull()
-                    println("Current user: ${user?.id}")
-                    Button(
-                        onClick = { /* Действие при нажатии */ },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Gray,
-                            contentColor = Color.White
-                        ),
-                        elevation = ButtonDefaults.buttonElevation(
-                            defaultElevation = 4.dp,
-                            pressedElevation = 2.dp
-                        ),
-                        modifier = Modifier.padding(top = 8.dp)
+                    // Текст поверх изображения (название, дата, цена)
+                    Column(
+                        modifier = Modifier
+                            .align(Alignment.BottomStart)
+                            .padding(16.dp)
                     ) {
                         Text(
-                            text = formatPrice(eventCard.cost),
-                            style = MaterialTheme.typography.bodyLarge.copy(
-                                fontWeight = FontWeight.Bold
+                            text = eventCard.title ?: "",
+                            color = Color.White,
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 30.sp,
+                                shadow = Shadow(
+                                    color = Color.Black.copy(alpha = 0.5f),
+                                    offset = Offset(1f, 1f),
+                                    blurRadius = 4f
+                                )
                             )
                         )
+
+                        Text(
+                            text = formatDate(eventCard.date),
+                            color = Color.White,
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                shadow = Shadow(
+                                    color = Color.Black.copy(alpha = 0.5f),
+                                    offset = Offset(1f, 1f),
+                                    blurRadius = 4f
+                                )
+                            )
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        if (Constant.supabase.auth.currentUserOrNull() != null) {
+                            Button(
+                                onClick = { /* Действие при нажатии */ },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color.Gray,
+                                    contentColor = Color.White
+                                ),
+                                elevation = ButtonDefaults.buttonElevation(
+                                    defaultElevation = 4.dp,
+                                    pressedElevation = 2.dp
+                                ),
+                                modifier = Modifier.padding(top = 8.dp)
+                            ) {
+                                Text(
+                                    text = formatPrice(eventCard.cost),
+                                    style = MaterialTheme.typography.bodyLarge.copy(
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+
+                // Блок с жанром и возрастом (под изображением)
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    // Строка с жанром и возрастом
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Блок "Жанр"
+                        Box(
+                            modifier = Modifier
+                                .background(
+                                    color = Color.LightGray.copy(alpha = 0.2f),
+                                    shape = RoundedCornerShape(8.dp)
+                                )
+                                .padding(horizontal = 12.dp, vertical = 6.dp)
+                        ) {
+                            Column() {
+                                Text(
+                                    text = "Рейтинг",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Normal,
+                                    color = Color.Gray,
+                                    fontSize = 20.sp
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "${eventCard.rating}/10 звезд",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.Black
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.padding(5.dp))
+
+                        // Блок "Возраст"
+                        Box(
+                            modifier = Modifier
+                                .background(
+                                    color = Color.LightGray.copy(alpha = 0.2f),
+                                    shape = RoundedCornerShape(8.dp)
+                                )
+                                .padding(horizontal = 12.dp, vertical = 6.dp)
+                        ) {
+                            Column() {
+                                Text(
+                                    text = "Возраст",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Normal,
+                                    color = Color.Gray,
+                                    fontSize = 20.sp
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "${eventCard.ageConst}+",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.Black
+                                )
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.padding(15.dp))
+                    when(eventState){
+                        is EventState.Initialized ->{
+                            Button(
+                                onClick = {
+                                    viewModelCardEventScreen.DeleteLogic(eventId)
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color.Gray,
+                                    contentColor = Color.White
+                                ),
+                                modifier = Modifier.align(Alignment.CenterHorizontally)
+                            ) {
+
+                                Text(text = "Удалить", fontSize = 18.sp)
+                            }
+                        }
+                        is EventState.Loading -> {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(48.dp).align(Alignment.CenterHorizontally), // Размер индикатора
+                                color = Color.Blue, // Цвет индикатора
+                                strokeWidth = 4.dp // Толщина линии
+                            )
+                        }
+                        is EventState.Delete ->{
+                            controlNav.navigate("main"){
+                                popUpTo("eventCard/${eventId}") { inclusive = true }
+                            }
+                        }
+                        is EventState.Updated -> {
+
+                        }
+                        is EventState.Error -> {
+                            Button(
+                                onClick = {
+                                    viewModelCardEventScreen.DeleteLogic(eventId)
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color.Gray,
+                                    contentColor = Color.White
+                                ),
+                                modifier = Modifier.align(Alignment.CenterHorizontally)
+                            ) {
+
+                                Text(text = "Удалить", fontSize = 18.sp)
+                            }
+                            Spacer(modifier = Modifier.padding(10.dp))
+                            Text(
+                                text = (eventState as EventState.Error).message,
+                                fontSize = 16.sp,
+                                color = Color.Black,
+                                fontWeight = FontWeight.W400,
+                                modifier = Modifier
+                                    .padding(bottom = 16.dp)
+                                    .align(Alignment.CenterHorizontally)
+                            )
+                        }
                     }
                 }
             }
-
         }
     }
 }

@@ -30,7 +30,7 @@ import com.example.ninovafisha.Domain.Models.Event
 import com.example.ninovafisha.R
 
 @Composable
-fun EventCard(event: Event?, controlNav: NavHostController){
+fun EventCard(event: Event?, controlNav: NavHostController, isAuthor:Boolean, isAdmin:Boolean){
     Column(modifier = Modifier
         .padding(16.dp)
         .padding(top = 50.dp)
@@ -50,7 +50,17 @@ fun EventCard(event: Event?, controlNav: NavHostController){
                 screenWidth * 0.6f     // Ограничение: не более 60% от ширины
             )
         }
-
+        if(isAuthor){
+            Text(
+                text = "Это ваше событие",
+                fontSize = 20.sp,
+                color = Color.Black,
+                fontWeight = FontWeight.W800,
+                modifier = Modifier
+                    .padding(bottom = 16.dp)
+            )
+        }
+        Spacer(modifier = Modifier.padding(5.dp))
         AsyncImage(
             model = imageModel,
             contentDescription = "Концертное изображение",
@@ -66,15 +76,18 @@ fun EventCard(event: Event?, controlNav: NavHostController){
 
         Spacer(modifier = Modifier.padding(10.dp))
 
-        Text(
-            text = "" + event?.title,
-            fontSize = 25.sp,
-            color = Color.Black,
-            fontWeight = FontWeight.W800,
-            modifier = Modifier
-                .padding(bottom = 16.dp)
-                .align(alignment = Alignment.Start)
-        )
+        Row(modifier = Modifier.align(alignment = Alignment.Start)) {
+            Text(
+                text = "" + event?.title,
+                fontSize = 25.sp,
+                color = Color.Black,
+                fontWeight = FontWeight.W800,
+                modifier = Modifier
+                    .padding(bottom = 16.dp)
+
+            )
+        }
+
         Text(
             text = "" + event?.desc,
             fontSize = 15.sp,
@@ -95,7 +108,10 @@ fun EventCard(event: Event?, controlNav: NavHostController){
                     contentColor = Color.White
                 )
             ) {
-                Text("Подробнее", fontSize = 15.sp)
+                Text(
+                    text = if (isAuthor || isAdmin) "Редактировать" else "Подробнее",
+                    fontSize = 15.sp
+                )
             }
             Spacer(modifier = Modifier.padding(10.dp))
             Text(
@@ -104,7 +120,8 @@ fun EventCard(event: Event?, controlNav: NavHostController){
                 color = Color.Black,
                 fontWeight = FontWeight.W800,
                 modifier = Modifier
-                    .padding(bottom = 16.dp).align(Alignment.CenterVertically)
+                    .padding(bottom = 16.dp)
+                    .align(Alignment.CenterVertically)
             )
             Spacer(modifier = Modifier.padding(10.dp))
             Text(
@@ -113,7 +130,8 @@ fun EventCard(event: Event?, controlNav: NavHostController){
                 color = Color.Black,
                 fontWeight = FontWeight.W800,
                 modifier = Modifier
-                    .padding(bottom = 16.dp).align(Alignment.CenterVertically)
+                    .padding(bottom = 16.dp)
+                    .align(Alignment.CenterVertically)
             )
         }
     }

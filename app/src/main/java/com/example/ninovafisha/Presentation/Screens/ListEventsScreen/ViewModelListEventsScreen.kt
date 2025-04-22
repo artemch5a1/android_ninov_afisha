@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavHostController
 import com.example.ninovafisha.Domain.Constant
 import com.example.ninovafisha.Domain.Models.Event
 import com.example.ninovafisha.Domain.Models.typeEvent
@@ -44,6 +45,9 @@ class ViewModelListEventsScreen: ViewModel() {
     private var _filtType: MutableList<Int> = mutableListOf()
     val filtType: List<Int> get() = _filtType
 
+    private val _user = mutableStateOf<String?>(null)
+    val user:String? get() = _user.value
+
     fun toggleType(typeId: Int, textSearch: String) {
         if (_filtType.contains(typeId)) {
             _filtType.remove(typeId)
@@ -68,6 +72,9 @@ class ViewModelListEventsScreen: ViewModel() {
     fun refresh() {
         loadEvents()
         loadTypes()
+        viewModelScope.launch {
+            _user.value = Constant.supabase.auth.currentUserOrNull()?.id
+        }
     }
 
     init {
@@ -143,9 +150,12 @@ class ViewModelListEventsScreen: ViewModel() {
             }
         }
     }*/
-    fun GetOut(){
+    fun GetOut(controller: NavHostController){
         viewModelScope.launch {
             Constant.supabase.auth.signOut()
+            controller.navigate("sigin"){
+                popUpTo("main") { inclusive = true }
+            }
         }
     }
 }

@@ -13,5 +13,6 @@ data class Event (
     val typeEvent:Int,
     @SerialName("date_start")
     val date:String,
-    val cost:Float
+    val cost:Float,
+    val author:String?
 )

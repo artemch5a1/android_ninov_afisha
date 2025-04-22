@@ -187,7 +187,9 @@ fun SignUpScreen(controlNav: NavHostController, signUpViewModel: SignUpViewModel
                 }
                 is ActualState.Success ->
                 {
-                    controlNav.navigate("sigin")
+                    controlNav.navigate("sigin"){
+                        popUpTo("siginup") { inclusive = true }
+                    }
                 }
             }
 

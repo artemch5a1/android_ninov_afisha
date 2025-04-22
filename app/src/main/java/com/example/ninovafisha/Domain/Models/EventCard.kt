@@ -14,5 +14,8 @@ data class EventCard (
     val typeEvent:Int = -1,
     @SerialName("date_start")
     val date:String? = null,
-    val cost:Float? = null
+    val cost:Float? = null,
+    @SerialName("age_const")
+    val ageConst:Int = 14,
+    val rating:Float = 7f
 )

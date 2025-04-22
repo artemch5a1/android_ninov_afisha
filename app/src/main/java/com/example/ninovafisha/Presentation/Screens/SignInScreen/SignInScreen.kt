@@ -119,7 +119,9 @@ fun SigninScreen(controlNav: NavHostController, signInViewModel: SignInViewModel
 
                 }
                 is ActualState.Success -> {
-                    controlNav.navigate("main")
+                    controlNav.navigate("main"){
+                        popUpTo("sigin") { inclusive = true }
+                    }
                 }
             }
             Spacer(modifier = Modifier.padding(10.dp))
@@ -131,7 +133,9 @@ fun SigninScreen(controlNav: NavHostController, signInViewModel: SignInViewModel
                 modifier = Modifier
                     .padding(bottom = 16.dp)
                     .align(Alignment.CenterHorizontally)
-                    .clickable { controlNav.navigate("main") }
+                    .clickable { controlNav.navigate("main"){
+                        popUpTo("sigin") { inclusive = true }
+                    } }
             )
         }
     }
