@@ -45,12 +45,12 @@ import java.util.Calendar
 import java.util.Date
 
 @Composable
-fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdateOrDelete: ViewModelUpdateOrDelete = viewModel {
-    ViewModelUpdateOrDelete(id = id)
+fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdateOrAdd: ViewModelUpdateOrAdd = viewModel {
+    ViewModelUpdateOrAdd(id = id)
 }){
-    val actualState by viewModelUpdateOrDelete.actualState.collectAsState()
-    val eventState by viewModelUpdateOrDelete.eventState.collectAsState()
-    val eventCard: EventCard = viewModelUpdateOrDelete.eventCard
+    val actualState by viewModelUpdateOrAdd.actualState.collectAsState()
+    val eventState by viewModelUpdateOrAdd.eventState.collectAsState()
+    val eventCard: EventCard = viewModelUpdateOrAdd.eventCard
     var showConfirmationDialog by remember { mutableStateOf(false) }
 
     val mContext = LocalContext.current // Получение контекста Android
@@ -77,13 +77,13 @@ fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdate
         textAction = "Добавление"
         confirmation = "Вы точно хотите добавить событие?"
         textButton = "Добавить"
-        onClick = {  }
+        onClick = { viewModelUpdateOrAdd.addEvent() }
     }
     else {
         textAction = "Изменение"
         confirmation = "Вы точно хотите изменить событие?"
         textButton = "Изменить"
-        onClick = { viewModelUpdateOrDelete.updateEvent() }
+        onClick = { viewModelUpdateOrAdd.updateEvent() }
     }
 
 
@@ -115,16 +115,16 @@ fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdate
 
                     myField(myText = "Название события",
                         text = eventCard.title,
-                        onValueChange = {it -> viewModelUpdateOrDelete.updateEventInfo(eventCard.copy(title = it))})
+                        onValueChange = {it -> viewModelUpdateOrAdd.updateEventInfo(eventCard.copy(title = it))})
 
                     myField(myText = "Описание события",
                         text = eventCard.desc,
-                        onValueChange = {it -> viewModelUpdateOrDelete.updateEventInfo(eventCard.copy(desc = it))})
+                        onValueChange = {it -> viewModelUpdateOrAdd.updateEventInfo(eventCard.copy(desc = it))})
 
 
                     myFieldCost(myText = "Цена (в рублях)",
                         text = eventCard.cost.toString(),
-                        onValueChange = {it -> viewModelUpdateOrDelete.updateEventInfo(eventCard.copy(cost = it.toFloat()))})
+                        onValueChange = {it -> viewModelUpdateOrAdd.updateEventInfo(eventCard.copy(cost = it.toFloat()))})
 
                     var selectedAgeConst by remember { mutableStateOf("+14") }
 
@@ -133,20 +133,20 @@ fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdate
                         items = listOf("+14", "+16", "+18"),
                         selectedItem = selectedAgeConst,
                         onItemSelected = { selectedAgeConst = it;
-                            viewModelUpdateOrDelete.updateEventInfo(eventCard.copy(ageConst = it.removePrefix("+").toInt()))}
+                            viewModelUpdateOrAdd.updateEventInfo(eventCard.copy(ageConst = it.removePrefix("+").toInt()))}
                     )
 
                     val mDatePickerDialog = DatePickerDialog(
                         mContext,
                         { _: DatePicker, mYear: Int, mMonth: Int, mDayOfMonth: Int ->
                             mDate.value = "$mYear-${mMonth+1}-$mDayOfMonth"
-                            viewModelUpdateOrDelete.updateEventInfo(eventCard.copy(date = "$mYear-${mMonth+1}-$mDayOfMonth"))
+                            viewModelUpdateOrAdd.updateEventInfo(eventCard.copy(date = "$mYear-${mMonth+1}-$mDayOfMonth"))
                         }, mYear, mMonth, mDay
                     )
                     Spacer(modifier = Modifier.padding(10.dp))
 
                     myField(myText = "Длинное описание события", text = eventCard.descLong + "",
-                        onValueChange = {it -> viewModelUpdateOrDelete.updateEventInfo(eventCard.copy(descLong = it))})
+                        onValueChange = {it -> viewModelUpdateOrAdd.updateEventInfo(eventCard.copy(descLong = it))})
 
                     Spacer(modifier = Modifier.padding(10.dp))
 
