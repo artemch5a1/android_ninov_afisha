@@ -73,7 +73,7 @@ fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdate
     var textButton:String = ""
     var onClick: () -> Unit
 
-    if(id == null){
+    if(id == "null"){
         textAction = "Добавление"
         confirmation = "Вы точно хотите добавить событие?"
         textButton = "Добавить"
@@ -285,19 +285,25 @@ fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdate
             }
         }
         is ActualState.Error -> {
-            Text(
-                text = (actualState as ActualState.Error).message  ?: "",
-                color = Color.White,
-                style = MaterialTheme.typography.titleLarge.copy(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 10.sp,
-                    shadow = Shadow(
-                        color = Color.Black.copy(alpha = 0.5f),
-                        offset = Offset(1f, 1f),
-                        blurRadius = 4f
-                    )
+            Box(
+                contentAlignment = Alignment.Center, // Центрируем содержимое
+                modifier = Modifier.fillMaxSize() // Занимаем всё доступное пространство
+            ) {
+                Text(
+                    text = (actualState as ActualState.Error).message  ?: "",
+                    color = Color.Black,
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontSize = 10.sp,
+                        shadow = Shadow(
+                            color = Color.Black.copy(alpha = 0.5f),
+                            offset = Offset(1f, 1f),
+                            blurRadius = 4f
+                        )
+                    ),
+                    textAlign = TextAlign.Center, // Центрируем текст внутри Text
+                    modifier = Modifier.fillMaxWidth() // Занимаем всю ширину
                 )
-            )
+            }
         }
     }
 }

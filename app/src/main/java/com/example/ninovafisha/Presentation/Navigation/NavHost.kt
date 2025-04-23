@@ -35,8 +35,13 @@ fun NavHost() {
             CardEventScreen(controlNav = controlNav, eventId = eventId)
         }
         composable("UpdateOrAdd/{eventId}"){
-            val eventId = it.arguments?.getString("eventId")
-            UpdateOrAddScreen(controlNav = controlNav, id = eventId)
+            val eventId = if (it.arguments?.getString("eventId") != null) {
+                it.arguments!!.getString("eventId") // если eventId есть
+                UpdateOrAddScreen(controlNav = controlNav, id = it.arguments!!.getString("eventId"))
+            } else {
+                UpdateOrAddScreen(controlNav = controlNav, id = null)
+                null
+            }
         }
     }
 

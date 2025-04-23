@@ -1,5 +1,6 @@
 package com.example.ninovafisha.Presentation.Screens.UpdateOrAddScreen
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,6 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 
 class ViewModelUpdateOrAdd(id:String?): ViewModel() {
     private val _actualState = MutableStateFlow<ActualState>(ActualState.Initialized)
@@ -25,28 +27,38 @@ class ViewModelUpdateOrAdd(id:String?): ViewModel() {
     private val _eventCard = mutableStateOf(EventCard(id = ""))
     val eventCard: EventCard get() = _eventCard.value
 
-
+    @Serializable
+    data class SupabaseEvent(
+        val title: String,
+        val desc: String,
+        val date_start: String?,
+        val cost: Double?,
+        val age_const: Int,
+        val Long_desc: String?
+    )
 
     init {
-        if(id != null)
-        {
-            loadEvent(id)
-        }
+        loadEvent(id)
     }
 
-    fun loadEvent(eventId:String){
+    fun loadEvent(eventId:String?){
         _actualState.value = ActualState.Loading
-        viewModelScope.launch {
-            try{
-                _eventCard.value = Constant.supabase
-                    .from("Events")
-                    .select{ filter { eq("id", value = eventId) }}
-                    .decodeSingle<EventCard>()
-                _actualState.value = ActualState.Success("")
+        if(eventId != "null" && eventId != null){
+            viewModelScope.launch {
+                try{
+                    _eventCard.value = Constant.supabase
+                        .from("Events")
+                        .select{ filter { eq("id", value = eventId) }}
+                        .decodeSingle<EventCard>()
+                    _actualState.value = ActualState.Success("")
+                }
+                catch (ex: Exception){
+                    _actualState.value = ActualState.Error("Ошибка загрузки данных: ${ex.message}")
+                }
             }
-            catch (ex: Exception){
-                _actualState.value = ActualState.Error("Ошибка загрузки данных: ${ex.message}")
-            }
+        }
+        else{
+            _actualState.value = ActualState.Success("")
         }
     }
 
@@ -62,7 +74,7 @@ class ViewModelUpdateOrAdd(id:String?): ViewModel() {
                     updateEventInfo(eventCard.copy(cost = null))
                 }
                 try {
-                    Constant.supabase.postgrest.from("Events").update(eventCard){filter { eq("id", eventCard.id) }}
+                    Constant.supabase.postgrest.from("Events").update(eventCard){filter { eq("id", eventCard.id ?: "") }}
                     _eventState.value = EventState.Updated("")
                 }
                 catch (e:AuthRestException){
@@ -86,7 +98,16 @@ class ViewModelUpdateOrAdd(id:String?): ViewModel() {
                     updateEventInfo(eventCard.copy(cost = null))
                 }
                 try {
-                    Constant.supabase.postgrest.from("Events").insert(eventCard)
+                    Constant.supabase.postgrest.from("Events").insert(
+                        SupabaseEvent(
+                        title = eventCard.title,
+                        desc = eventCard.desc,
+                        date_start = eventCard.date?.toString(),
+                        cost = eventCard.cost?.toDouble(),
+                        age_const = eventCard.ageConst,
+                        Long_desc = eventCard.descLong
+                    )
+                    )
                     _eventState.value = EventState.DeleteOrAdd("Event added")
                 }
                 catch (e:AuthRestException){
