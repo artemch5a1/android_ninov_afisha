@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlin.math.cos
 
 class ViewModelUpdateOrDelete(id:String?): ViewModel() {
     private val _actualState = MutableStateFlow<ActualState>(ActualState.Initialized)
@@ -57,15 +58,23 @@ class ViewModelUpdateOrDelete(id:String?): ViewModel() {
     fun updateEvent(){
         _eventState.value = EventState.Loading
         viewModelScope.launch {
-            try {
-                Constant.supabase.postgrest.from("Events").update(eventCard){filter { eq("id", eventCard.id) }}
-                _eventState.value = EventState.Updated("")
+            if(eventCard.title != "" && eventCard.desc != "" && eventCard.descLong != ""){
+                if(eventCard.cost == 0f){
+                    updateEventInfo(eventCard.copy(cost = null))
+                }
+                try {
+                    Constant.supabase.postgrest.from("Events").update(eventCard){filter { eq("id", eventCard.id) }}
+                    _eventState.value = EventState.Updated("")
+                }
+                catch (e:AuthRestException){
+                    _eventState.value = EventState.Error("${e.errorDescription} ")
+                }
+                catch (e:Exception){
+                    _eventState.value = EventState.Error("${e.message} ")
+                }
             }
-            catch (e:AuthRestException){
-                _eventState.value = EventState.Error("${e.errorDescription} ")
-            }
-            catch (e:Exception){
-                _eventState.value = EventState.Error("${e.message} ")
+            else {
+                _eventState.value = EventState.Error("Не все поля заполнены")
             }
         }
     }

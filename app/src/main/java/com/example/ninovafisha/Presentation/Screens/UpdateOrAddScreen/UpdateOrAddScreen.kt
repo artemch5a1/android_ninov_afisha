@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
@@ -28,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -66,6 +68,24 @@ fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdate
     mCalendar.time = Date()
 
     val mDate = remember { mutableStateOf("Выберите дату") }
+    var textAction:String = ""
+    var confirmation:String = ""
+    var textButton:String = ""
+    var onClick: () -> Unit
+
+    if(id == null){
+        textAction = "Добавление"
+        confirmation = "Вы точно хотите добавить событие?"
+        textButton = "Добавить"
+        onClick = {  }
+    }
+    else {
+        textAction = "Изменение"
+        confirmation = "Вы точно хотите изменить событие?"
+        textButton = "Изменить"
+        onClick = { viewModelUpdateOrDelete.updateEvent() }
+    }
+
 
     when(actualState)
     {
@@ -85,7 +105,7 @@ fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdate
                 Column(modifier = Modifier.padding(16.dp)) {
 
                     Text(
-                        text = "Изменение события",
+                        text = textAction,
                         fontSize = 32.sp,
                         color = Color.Black,
                         fontWeight = FontWeight.W800,
@@ -123,6 +143,10 @@ fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdate
                             viewModelUpdateOrDelete.updateEventInfo(eventCard.copy(date = "$mYear-${mMonth+1}-$mDayOfMonth"))
                         }, mYear, mMonth, mDay
                     )
+                    Spacer(modifier = Modifier.padding(10.dp))
+
+                    myField(myText = "Длинное описание события", text = eventCard.descLong + "",
+                        onValueChange = {it -> viewModelUpdateOrDelete.updateEventInfo(eventCard.copy(descLong = it))})
 
                     Spacer(modifier = Modifier.padding(10.dp))
 
@@ -151,7 +175,7 @@ fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdate
                                     modifier = Modifier
                                 ) {
 
-                                    Text(text = "Изменить", fontSize = 18.sp)
+                                    Text(text = textButton, fontSize = 18.sp)
                                 }
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Button(
@@ -173,11 +197,11 @@ fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdate
                                     Dialog(
                                         showConfirmationDialog = showConfirmationDialog,
                                         onClick = { showConfirmationDialog = false
-                                            viewModelUpdateOrDelete.updateEvent() },
+                                            onClick() },
                                         onDismissRequest = { showConfirmationDialog = false },
                                         onClickNo = { showConfirmationDialog = false },
                                         title = "Подтверждение",
-                                        desc = "Вы уверены, что хотите изменить это событие?"
+                                        desc = confirmation
                                     )
                                 }
                             }
@@ -186,11 +210,11 @@ fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdate
                             CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                         }
                         is EventState.Error -> {
-                            Column {
+                            Column (){
                                 Row (modifier = Modifier.align(alignment = Alignment.CenterHorizontally)){
                                     Button(
                                         onClick = {
-                                            viewModelUpdateOrDelete.updateEvent()
+                                            showConfirmationDialog = true
                                         },
                                         colors = ButtonDefaults.buttonColors(
                                             containerColor = Color.Gray,
@@ -199,7 +223,7 @@ fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdate
                                         modifier = Modifier
                                     ) {
 
-                                        Text(text = "Изменить", fontSize = 18.sp)
+                                        Text(text = textButton, fontSize = 18.sp)
                                     }
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Button(
@@ -220,7 +244,7 @@ fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdate
                                 }
                                 Spacer(modifier = Modifier.padding(10.dp))
                                 Text(
-                                    text = (eventState as EventState.Error).message  ?: "",
+                                    text = (eventState as EventState.Error).message ?: "",
                                     color = Color.Black,
                                     style = MaterialTheme.typography.titleLarge.copy(
                                         fontSize = 10.sp,
@@ -229,8 +253,21 @@ fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdate
                                             offset = Offset(1f, 1f),
                                             blurRadius = 4f
                                         )
-                                    )
+                                    ),
+                                    textAlign = TextAlign.Center, // Центрирование по горизонтали
+                                    modifier = Modifier.fillMaxWidth() // Занимает всю доступную ширину
                                 )
+                                if(showConfirmationDialog){
+                                    Dialog(
+                                        showConfirmationDialog = showConfirmationDialog,
+                                        onClick = { showConfirmationDialog = false
+                                            onClick() },
+                                        onDismissRequest = { showConfirmationDialog = false },
+                                        onClickNo = { showConfirmationDialog = false },
+                                        title = "Подтверждение",
+                                        desc = confirmation
+                                    )
+                                }
                             }
                         }
                         is EventState.Updated -> {
@@ -238,8 +275,10 @@ fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdate
                                 popUpTo("UpdateOrAdd/${id}") { inclusive = true }
                             }
                         }
-                        is EventState.Delete -> {
-
+                        is EventState.DeleteOrAdd -> {
+                            controlNav.navigate("main"){
+                                popUpTo("UpdateOrAdd/${id}") { inclusive = true }
+                            }
                         }
                     }
                 }

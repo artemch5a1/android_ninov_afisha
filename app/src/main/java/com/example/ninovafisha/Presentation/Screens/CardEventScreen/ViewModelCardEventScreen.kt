@@ -45,7 +45,7 @@ class ViewModelCardEventScreen(eventId:String): ViewModel() {
         viewModelScope.launch {
             try {
                 supabase.postgrest.from("Events").delete { filter { eq("id", eventId) } }
-                _eventState.value = EventState.Delete("")
+                _eventState.value = EventState.DeleteOrAdd("")
                 Log.d("Delete","Success")
             }
             catch (ex: AuthRestException){

@@ -23,10 +23,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -34,24 +35,20 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.ninovafisha.Domain.Constant
 import com.example.ninovafisha.Domain.States.ActualState
 import com.example.ninovafisha.Domain.States.EventState
+import com.example.ninovafisha.Presentation.Screens.Components.Dialog
 import com.example.ninovafisha.R
 import io.github.jan.supabase.auth.auth
 import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 
 @Composable
@@ -63,6 +60,7 @@ fun CardEventScreen(controlNav: NavController, eventId:String, viewModelCardEven
     val eventState by viewModelCardEventScreen.eventState.collectAsState()
     val eventCard = viewModelCardEventScreen.eventCard
     val user = viewModelCardEventScreen.user
+    var showConfirmationDialog by remember { mutableStateOf(false) }
 
     /*val formattedDate = remember(eventCard.date) {
         SimpleDateFormat("d MMMM yyyy 'года'", Locale("ru"))
@@ -279,6 +277,24 @@ fun CardEventScreen(controlNav: NavController, eventId:String, viewModelCardEven
                             }
                         }
                     }
+                    if(eventCard.descLong != null) {
+                        Column {
+                            Spacer(Modifier.padding(10.dp))
+                            Text(
+                                text = eventCard.descLong  ?: "",
+                                color = Color.Black,
+                                style = MaterialTheme.typography.titleLarge.copy(
+                                    fontSize = 15.sp,
+                                    shadow = Shadow(
+                                        color = Color.Black.copy(alpha = 0.5f),
+                                        offset = Offset(1f, 1f),
+                                        blurRadius = 4f
+                                    )
+                                )
+                            )
+                            Spacer(Modifier.padding(10.dp))
+                        }
+                    }
                     Spacer(modifier = Modifier.padding(15.dp))
                     when(eventState){
                         is EventState.Initialized ->{
@@ -286,7 +302,7 @@ fun CardEventScreen(controlNav: NavController, eventId:String, viewModelCardEven
                                 Row {
                                     Button(
                                         onClick = {
-                                            viewModelCardEventScreen.DeleteLogic(eventId)
+                                            showConfirmationDialog = true
                                         },
                                         colors = ButtonDefaults.buttonColors(
                                             containerColor = Color.Gray,
@@ -296,6 +312,17 @@ fun CardEventScreen(controlNav: NavController, eventId:String, viewModelCardEven
                                     ) {
 
                                         Text(text = "Удалить", fontSize = 18.sp)
+                                    }
+                                    if(showConfirmationDialog){
+                                        Dialog(
+                                            showConfirmationDialog = showConfirmationDialog,
+                                            onClick = { showConfirmationDialog = false
+                                                viewModelCardEventScreen.DeleteLogic(eventId) },
+                                            onDismissRequest = { showConfirmationDialog = false },
+                                            onClickNo = { showConfirmationDialog = false },
+                                            title = "Подтверждение",
+                                            desc = "Вы уверены, что хотите изменить это событие?"
+                                        )
                                     }
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Button(
@@ -325,7 +352,7 @@ fun CardEventScreen(controlNav: NavController, eventId:String, viewModelCardEven
                                 strokeWidth = 4.dp // Толщина линии
                             )
                         }
-                        is EventState.Delete ->{
+                        is EventState.DeleteOrAdd ->{
                             controlNav.navigate("main"){
                                 popUpTo("eventCard/${eventId}") { inclusive = true }
                             }
@@ -374,7 +401,7 @@ fun CardEventScreen(controlNav: NavController, eventId:String, viewModelCardEven
                             .padding(16.dp)
                             .align(Alignment.TopStart)
                             .clickable {
-                                controlNav.navigate("main"){
+                                controlNav.navigate("main") {
                                     popUpTo("eventCard/${eventId}")
                                 }
                             },

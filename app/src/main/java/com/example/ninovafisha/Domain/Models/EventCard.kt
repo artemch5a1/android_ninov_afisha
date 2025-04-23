@@ -18,5 +18,7 @@ data class EventCard (
     @SerialName("age_const")
     val ageConst:Int = 14,
     val rating:Float = 7f,
-    val author:String? = null
+    val author:String? = null,
+    @SerialName("Long_desc")
+    val descLong:String? = null
 )
