@@ -5,10 +5,13 @@ import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ninovafisha.Domain.Constant
 import com.example.ninovafisha.Domain.Models.EventCard
+import com.example.ninovafisha.Domain.Models.typeEvent
 import com.example.ninovafisha.Domain.States.ActualState
 import com.example.ninovafisha.Domain.States.EventState
 import io.github.jan.supabase.auth.exception.AuthRestException
@@ -34,6 +37,13 @@ class ViewModelUpdateOrAdd(id:String?): ViewModel() {
     private val _eventCard = mutableStateOf(EventCard(id = ""))
     val eventCard: EventCard get() = _eventCard.value
 
+    private val _types = MutableLiveData<List<typeEvent>>()
+    val types: LiveData<List<typeEvent>> get() = _types
+
+
+
+
+
     @Serializable
     data class SupabaseEvent(
         val title: String,
@@ -41,11 +51,13 @@ class ViewModelUpdateOrAdd(id:String?): ViewModel() {
         val date_start: String?,
         val cost: Double?,
         val age_const: Int,
-        val Long_desc: String?
+        val Long_desc: String?,
+        val image:String?
     )
 
     init {
         loadEvent(id)
+        loadTypes()
     }
 
     fun loadEvent(eventId:String?){
@@ -66,6 +78,19 @@ class ViewModelUpdateOrAdd(id:String?): ViewModel() {
         }
         else{
             _actualState.value = ActualState.Success("")
+        }
+    }
+
+    fun loadTypes(){
+        _actualState.value = ActualState.Loading
+        viewModelScope.launch {
+            try{
+                _types.value = Constant.supabase.postgrest.from("type_event").select().decodeList()
+                _actualState.value = ActualState.Initialized
+            }
+            catch (ex: Exception) {
+                _actualState.value = ActualState.Error(ex.message ?: "Ошибка получения данных")
+            }
         }
     }
 
@@ -108,7 +133,7 @@ class ViewModelUpdateOrAdd(id:String?): ViewModel() {
         }
     }
 
-    fun addEvent(){
+    fun addEvent(uri: Uri?, context: Context){
         _eventState.value = EventState.Loading
         viewModelScope.launch {
             if(eventCard.title != "" && eventCard.desc != "" && eventCard.descLong != "" && eventCard.date != null && eventCard.cost != null){
@@ -116,6 +141,20 @@ class ViewModelUpdateOrAdd(id:String?): ViewModel() {
                     updateEventInfo(eventCard.copy(cost = null))
                 }
                 try {
+                    var imageUrl:String? = null
+                    Log.d("URIIIIIII", "${uri}")
+                    uri?.let {
+                        Log.d("URIIIIIII", "${uri}")
+                        val byt = withContext(Dispatchers.IO) {
+                            context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+                        }
+                        val fileName = "titleimage/${UUID.randomUUID()}.jpg"
+                        Constant.supabase.storage
+                            .from("images")
+                            .upload(fileName, byt!!)
+                        imageUrl = Constant.supabase.storage.from("images").publicUrl(fileName)
+                    }
+                    updateEventInfo(eventCard.copy(image = imageUrl))
                     Constant.supabase.postgrest.from("Events").insert(
                         SupabaseEvent(
                         title = eventCard.title,
@@ -123,7 +162,7 @@ class ViewModelUpdateOrAdd(id:String?): ViewModel() {
                         date_start = eventCard.date?.toString(),
                         cost = eventCard.cost?.toDouble(),
                         age_const = eventCard.ageConst,
-                        Long_desc = eventCard.descLong
+                        Long_desc = eventCard.descLong, image = eventCard.image
                     )
                     )
                     _eventState.value = EventState.DeleteOrAdd("Event added")

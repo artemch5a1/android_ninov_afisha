@@ -12,17 +12,22 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -36,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.ninovafisha.Domain.Models.EventCard
+import com.example.ninovafisha.Domain.Models.typeEvent
 import com.example.ninovafisha.Domain.States.ActualState
 import com.example.ninovafisha.Domain.States.EventState
 import com.example.ninovafisha.Presentation.Screens.CardEventScreen.SimpleImagePicker
@@ -54,6 +60,16 @@ fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdate
     val eventState by viewModelUpdateOrAdd.eventState.collectAsState()
     val eventCard: EventCard = viewModelUpdateOrAdd.eventCard
     var showConfirmationDialog by remember { mutableStateOf(false) }
+
+    val types = viewModelUpdateOrAdd.types.observeAsState(emptyList())
+
+    val typString: MutableList<String> = mutableListOf()
+
+
+
+    types.value.forEach{element ->
+        typString.add(element.title)
+    }
 
     val mContext = LocalContext.current // Получение контекста Android
 
@@ -80,7 +96,7 @@ fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdate
         textAction = "Добавление"
         confirmation = "Вы точно хотите добавить событие?"
         textButton = "Добавить"
-        onClick = { viewModelUpdateOrAdd.addEvent() }
+        onClick = { viewModelUpdateOrAdd.addEvent(selectedImageUri, mContext) }
     }
     else {
         textAction = "Изменение"
@@ -137,6 +153,24 @@ fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdate
                         selectedItem = selectedAgeConst,
                         onItemSelected = { selectedAgeConst = it;
                             viewModelUpdateOrAdd.updateEventInfo(eventCard.copy(ageConst = it.removePrefix("+").toInt()))}
+                    )
+
+
+                    var selectedTypeConst by remember { mutableStateOf("") }
+
+                    LaunchedEffect(types.value) {
+                        snapshotFlow { types.value }
+                            .collect { typeList ->
+                                selectedTypeConst = typeList.firstOrNull { x -> x.id == eventCard.typeEvent }?.title ?: ""
+                            }
+                    }
+
+                    DropdownField(
+                        label = "Выберите категорию",
+                        items = typString,
+                        selectedItem = selectedTypeConst,
+                        onItemSelected = { selectedTypeConst = it;
+                            viewModelUpdateOrAdd.updateEventInfo(eventCard.copy(typeEvent = types.value.firstOrNull{ x -> x.title == it }!!.id))}
                     )
 
                     val mDatePickerDialog = DatePickerDialog(

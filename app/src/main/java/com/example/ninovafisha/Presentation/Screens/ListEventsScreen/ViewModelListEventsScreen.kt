@@ -78,8 +78,13 @@ class ViewModelListEventsScreen: ViewModel() {
         loadTypes()
         viewModelScope.launch {
             _user.value = Constant.supabase.auth.currentUserOrNull()?.id
-            var id = Constant.supabase.auth.currentUserOrNull()?.id
-            _userRole.value = Constant.supabase.postgrest.from("Profile").select{ filter { eq("id", value = "${id}") }}.decodeSingleOrNull()
+            var id = Constant.supabase.auth.currentUserOrNull()?.id ?: ""
+            if(id != ""){
+                _userRole.value = Constant.supabase.postgrest.from("Profile").select{ filter { eq("id", value = "${id}") }}.decodeSingleOrNull()
+            }
+            else{
+                _userRole.value = null
+            }
             Log.d("role = ", "${_userRole.value?.role}")
         }
     }
