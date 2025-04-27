@@ -23,13 +23,10 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 
 @Composable
-fun SimpleImagePiker(){
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(0.5f),
-        contentAlignment = Alignment.Center// Вы можете настроить высоту по своему усмотрению
-    ) {
+fun SimpleImagePicker(
+    onImagePicked: (Uri?) -> Unit // Колбэк для возврата Uri
+) {
+
         val context = LocalContext.current
         var imageUri by remember { mutableStateOf<Uri?>(null) }
 
@@ -37,10 +34,11 @@ fun SimpleImagePiker(){
             contract = ActivityResultContracts.GetContent()
         ) { uri: Uri? ->
             imageUri = uri
+            onImagePicked(uri) // Передаём выбранный Uri наружу
         }
 
-        Column (modifier = Modifier.padding(16.dp)){
-            Button(onClick = { launcher.launch("image/*") }) {
+
+            Button(modifier = Modifier.padding(start = 66.dp),onClick = { launcher.launch("image/*") }) {
                 Text("Выбрать из галереи")
             }
 
@@ -48,9 +46,9 @@ fun SimpleImagePiker(){
                 AsyncImage(
                     model = uri,
                     contentDescription = "Выбранное изображение",
-                    modifier = Modifier.size(200.dp)
+                    modifier = Modifier.size(200.dp).padding(start = 70.dp)
                 )
             }
-        }
-    }
+
+
 }

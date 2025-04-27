@@ -1,7 +1,10 @@
 package com.example.ninovafisha.Presentation.Screens.UpdateOrAddScreen
 
+import android.content.Context
+import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ninovafisha.Domain.Constant
@@ -11,11 +14,15 @@ import com.example.ninovafisha.Domain.States.EventState
 import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.storage.storage
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
+import java.util.UUID
 
 class ViewModelUpdateOrAdd(id:String?): ViewModel() {
     private val _actualState = MutableStateFlow<ActualState>(ActualState.Initialized)
@@ -66,14 +73,25 @@ class ViewModelUpdateOrAdd(id:String?): ViewModel() {
         _eventCard.value = newCard
     }
 
-    fun updateEvent(){
+    fun updateEvent(uri: Uri?, context: Context){
         _eventState.value = EventState.Loading
         viewModelScope.launch {
             if(eventCard.title != "" && eventCard.desc != "" && eventCard.descLong != ""){
-                if(eventCard.cost == 0f){
-                    updateEventInfo(eventCard.copy(cost = null))
-                }
                 try {
+                    var imageUrl:String? = null
+                    Log.d("URIIIIIII", "${uri}")
+                    uri?.let {
+                        Log.d("URIIIIIII", "${uri}")
+                        val byt = withContext(Dispatchers.IO) {
+                            context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+                        }
+                        val fileName = "titleimage/${UUID.randomUUID()}.jpg"
+                        Constant.supabase.storage
+                            .from("images")
+                            .upload(fileName, byt!!)
+                        imageUrl = Constant.supabase.storage.from("images").publicUrl(fileName)
+                    }
+                    updateEventInfo(eventCard.copy(image = imageUrl))
                     Constant.supabase.postgrest.from("Events").update(eventCard){filter { eq("id", eventCard.id ?: "") }}
                     _eventState.value = EventState.Updated("")
                 }
@@ -93,7 +111,7 @@ class ViewModelUpdateOrAdd(id:String?): ViewModel() {
     fun addEvent(){
         _eventState.value = EventState.Loading
         viewModelScope.launch {
-            if(eventCard.title != "" && eventCard.desc != "" && eventCard.descLong != ""){
+            if(eventCard.title != "" && eventCard.desc != "" && eventCard.descLong != "" && eventCard.date != null && eventCard.cost != null){
                 if(eventCard.cost == 0f){
                     updateEventInfo(eventCard.copy(cost = null))
                 }

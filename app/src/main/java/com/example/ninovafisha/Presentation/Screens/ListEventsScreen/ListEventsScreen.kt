@@ -51,6 +51,7 @@ fun ListEventsScreen(controlNav: NavHostController, viewModelListEventsScreen: V
     val eventsState by viewModelListEventsScreen.eventsState.collectAsState()
     val filtType = viewModelListEventsScreen.filtType
     val user = viewModelListEventsScreen.user
+    val role = viewModelListEventsScreen.userRole
     val idd:String? = null
 
     when(eventsState){
@@ -138,18 +139,21 @@ fun ListEventsScreen(controlNav: NavHostController, viewModelListEventsScreen: V
             Row (modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End, // Выравнивание элементов справа
                 verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Выход",
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .clickable {
-                            controlNav.navigate("UpdateOrAdd/${idd}"){
-                                popUpTo("main")
-                            }
-                        },
-                    tint = Color.Black
-                )
+                if(role?.role == 2 || role?.role == 3){
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Добавить",
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .clickable {
+                                controlNav.navigate("UpdateOrAdd/${idd}"){
+                                    popUpTo("main")
+                                }
+                            },
+                        tint = Color.Black
+                    )
+                }
+
                 Spacer(modifier = Modifier.padding(10.dp))
                 Icon(
                     imageVector = Icons.Default.ExitToApp,

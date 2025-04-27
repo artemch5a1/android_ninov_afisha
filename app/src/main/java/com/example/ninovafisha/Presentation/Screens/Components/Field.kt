@@ -47,7 +47,7 @@ fun myField(myText: String, text: String, onValueChange: (String) -> Unit){
         onValueChange = onValueChange,
         label = { Text(myText) },
         shape = RoundedCornerShape(15.dp),
-        modifier = Modifier.padding(horizontal = 0.05f.dp)
+        modifier = Modifier.padding(horizontal = 16.dp)
     )
 }
 
@@ -77,7 +77,7 @@ fun DropdownField(
             ),
             shape = RoundedCornerShape(15.dp),
             modifier = Modifier
-                .padding(horizontal = 0.05f.dp)
+                .padding(horizontal = 16.dp)
                 .clickable { expanded = true }
         )
 
@@ -117,7 +117,7 @@ fun myFieldCost(myText: String, text: String, onValueChange: (String) -> Unit){
         },
         label = { Text(myText) },
         shape = RoundedCornerShape(15.dp),
-        modifier = Modifier.padding(horizontal = 0.05f.dp)
+        modifier = Modifier.padding(horizontal = 16.dp)
     )
 }
 
@@ -137,7 +137,7 @@ fun myFieldPass(myText: String, text: String, onValueChange: (String) -> Unit) {
         onValueChange = onValueChange,
         label = { Text(myText) },
         shape = RoundedCornerShape(15.dp),
-        modifier = Modifier.padding(horizontal = 0.5f.dp),
+        modifier = Modifier.padding(horizontal = 16.dp),
         visualTransformation = if (passSee) {
             VisualTransformation.None
         } else {

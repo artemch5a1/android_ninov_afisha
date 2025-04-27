@@ -1,5 +1,6 @@
 package com.example.ninovafisha.Presentation.Screens.ListEventsScreen
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -8,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.example.ninovafisha.Domain.Constant
 import com.example.ninovafisha.Domain.Models.Event
+import com.example.ninovafisha.Domain.Models.Profile
 import com.example.ninovafisha.Domain.Models.typeEvent
 import com.example.ninovafisha.Domain.States.ActualState
 import com.example.ninovafisha.Domain.States.FilterState
@@ -47,6 +49,8 @@ class ViewModelListEventsScreen: ViewModel() {
 
     private val _user = mutableStateOf<String?>(null)
     val user:String? get() = _user.value
+    private val _userRole = mutableStateOf<Profile?>(null)
+    val userRole:Profile? get() = _userRole.value
 
     fun toggleType(typeId: Int, textSearch: String) {
         if (_filtType.contains(typeId)) {
@@ -74,6 +78,9 @@ class ViewModelListEventsScreen: ViewModel() {
         loadTypes()
         viewModelScope.launch {
             _user.value = Constant.supabase.auth.currentUserOrNull()?.id
+            var id = Constant.supabase.auth.currentUserOrNull()?.id
+            _userRole.value = Constant.supabase.postgrest.from("Profile").select{ filter { eq("id", value = "${id}") }}.decodeSingleOrNull()
+            Log.d("role = ", "${_userRole.value?.role}")
         }
     }
 

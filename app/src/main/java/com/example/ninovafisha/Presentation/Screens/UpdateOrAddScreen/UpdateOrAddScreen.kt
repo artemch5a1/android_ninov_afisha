@@ -1,6 +1,7 @@
 package com.example.ninovafisha.Presentation.Screens.UpdateOrAddScreen
 
 import android.app.DatePickerDialog
+import android.net.Uri
 import android.widget.DatePicker
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -37,6 +38,7 @@ import androidx.navigation.NavHostController
 import com.example.ninovafisha.Domain.Models.EventCard
 import com.example.ninovafisha.Domain.States.ActualState
 import com.example.ninovafisha.Domain.States.EventState
+import com.example.ninovafisha.Presentation.Screens.CardEventScreen.SimpleImagePicker
 import com.example.ninovafisha.Presentation.Screens.Components.Dialog
 import com.example.ninovafisha.Presentation.Screens.Components.DropdownField
 import com.example.ninovafisha.Presentation.Screens.Components.myField
@@ -72,6 +74,7 @@ fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdate
     var confirmation:String = ""
     var textButton:String = ""
     var onClick: () -> Unit
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
     if(id == "null"){
         textAction = "Добавление"
@@ -83,7 +86,7 @@ fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdate
         textAction = "Изменение"
         confirmation = "Вы точно хотите изменить событие?"
         textButton = "Изменить"
-        onClick = { viewModelUpdateOrAdd.updateEvent() }
+        onClick = { viewModelUpdateOrAdd.updateEvent(selectedImageUri, mContext) }
     }
 
 
@@ -102,7 +105,7 @@ fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdate
         is ActualState.Success, ActualState.Initialized -> {
             Box(modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center) {
-                Column(modifier = Modifier.padding(16.dp)) {
+                Column(modifier = Modifier.padding(16.dp).align(alignment = Alignment.Center)) {
 
                     Text(
                         text = textAction,
@@ -163,6 +166,15 @@ fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdate
                     when(eventState)
                     {
                         is EventState.Initialized -> {
+                            Spacer(modifier = Modifier.width(8.dp))
+
+
+
+                            // Интеграция пикера
+                            SimpleImagePicker { uri ->
+                                selectedImageUri = uri }  // Сохраняем Uri в состоянии родителя
+
+                            Spacer(modifier = Modifier.width(8.dp))
                             Row (modifier = Modifier.align(alignment = Alignment.CenterHorizontally)){
                                 Button(
                                     onClick = {
@@ -177,10 +189,9 @@ fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdate
 
                                     Text(text = textButton, fontSize = 18.sp)
                                 }
-                                Spacer(modifier = Modifier.width(8.dp))
                                 Button(
                                     onClick = {
-                                        controlNav.navigate("eventCard/${id}"){
+                                        controlNav.navigate("main"){
                                             popUpTo("EventCard/${id}") { inclusive = true }
                                         }
                                     },
@@ -210,6 +221,13 @@ fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdate
                             CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                         }
                         is EventState.Error -> {
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            // Интеграция пикера
+                            SimpleImagePicker { uri ->
+                                selectedImageUri = uri }  // Сохраняем Uri в состоянии родителя
+
+                            Spacer(modifier = Modifier.width(8.dp))
                             Column (){
                                 Row (modifier = Modifier.align(alignment = Alignment.CenterHorizontally)){
                                     Button(
@@ -228,7 +246,7 @@ fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdate
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Button(
                                         onClick = {
-                                            controlNav.navigate("eventCard/${id}"){
+                                            controlNav.navigate("main"){
                                                 popUpTo("EventCard/${id}") { inclusive = true }
                                             }
                                         },
