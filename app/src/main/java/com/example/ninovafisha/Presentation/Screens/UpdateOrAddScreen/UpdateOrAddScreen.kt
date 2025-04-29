@@ -197,14 +197,13 @@ fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdate
                                 }
                         )
                         Spacer(modifier = Modifier.padding(10.dp))
+                        // Интеграция пикера
+                        SimpleImagePicker { uri ->
+                            selectedImageUri = uri }  // Сохраняем Uri в состоянии родителя
+
                         when(eventState)
                         {
                             is EventState.Initialized -> {
-                                Spacer(modifier = Modifier.width(8.dp))
-                                // Интеграция пикера
-                                SimpleImagePicker { uri ->
-                                    selectedImageUri = uri }  // Сохраняем Uri в состоянии родителя
-
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Row (modifier = Modifier.align(alignment = Alignment.Center)){
                                     Button(
@@ -252,12 +251,6 @@ fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdate
                                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                             }
                             is EventState.Error -> {
-                                Spacer(modifier = Modifier.width(8.dp))
-
-                                // Интеграция пикера
-                                SimpleImagePicker { uri ->
-                                    selectedImageUri = uri }  // Сохраняем Uri в состоянии родителя
-
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Column (){
                                     Row (modifier = Modifier.align(alignment = Alignment.CenterHorizontally)){
