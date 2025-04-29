@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -121,149 +122,91 @@ fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdate
         is ActualState.Success, ActualState.Initialized -> {
             Box(modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center) {
-                Column(modifier = Modifier.padding(16.dp).align(alignment = Alignment.Center)) {
+                LazyColumn(modifier = Modifier.padding(16.dp).align(alignment = Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
+                    items(1){
+                        Text(
+                            text = textAction,
+                            fontSize = 32.sp,
+                            color = Color.Black,
+                            fontWeight = FontWeight.W800,
+                            modifier = Modifier
+                                .padding(bottom = 16.dp).align(Alignment.Center))
 
-                    Text(
-                        text = textAction,
-                        fontSize = 32.sp,
-                        color = Color.Black,
-                        fontWeight = FontWeight.W800,
-                        modifier = Modifier
-                            .padding(bottom = 16.dp)
-                            .align(Alignment.CenterHorizontally))
+                        myField(myText = "Название события",
+                            text = eventCard.title,
+                            onValueChange = {it1 -> viewModelUpdateOrAdd.updateEventInfo(eventCard.copy(title = it1))})
 
-                    myField(myText = "Название события",
-                        text = eventCard.title,
-                        onValueChange = {it -> viewModelUpdateOrAdd.updateEventInfo(eventCard.copy(title = it))})
-
-                    myField(myText = "Описание события",
-                        text = eventCard.desc,
-                        onValueChange = {it -> viewModelUpdateOrAdd.updateEventInfo(eventCard.copy(desc = it))})
-
-
-                    myFieldCost(myText = "Цена (в рублях)",
-                        text = eventCard.cost.toString(),
-                        onValueChange = {it -> viewModelUpdateOrAdd.updateEventInfo(eventCard.copy(cost = it.toFloat()))})
-
-                    var selectedAgeConst by remember { mutableStateOf("+14") }
-
-                    DropdownField(
-                        label = "Выберите возрастное исключение",
-                        items = listOf("+14", "+16", "+18"),
-                        selectedItem = selectedAgeConst,
-                        onItemSelected = { selectedAgeConst = it;
-                            viewModelUpdateOrAdd.updateEventInfo(eventCard.copy(ageConst = it.removePrefix("+").toInt()))}
-                    )
+                        myField(myText = "Описание события",
+                            text = eventCard.desc,
+                            onValueChange = {it1 -> viewModelUpdateOrAdd.updateEventInfo(eventCard.copy(desc = it1))})
 
 
-                    var selectedTypeConst by remember { mutableStateOf("") }
+                        myFieldCost(myText = "Цена (в рублях)",
+                            text = eventCard.cost.toString(),
+                            onValueChange = {it1 -> viewModelUpdateOrAdd.updateEventInfo(eventCard.copy(cost = it1.toFloat()))})
 
-                    LaunchedEffect(types.value) {
-                        snapshotFlow { types.value }
-                            .collect { typeList ->
-                                selectedTypeConst = typeList.firstOrNull { x -> x.id == eventCard.typeEvent }?.title ?: ""
-                            }
-                    }
+                        var selectedAgeConst by remember { mutableStateOf("+14") }
 
-                    DropdownField(
-                        label = "Выберите категорию",
-                        items = typString,
-                        selectedItem = selectedTypeConst,
-                        onItemSelected = { selectedTypeConst = it;
-                            viewModelUpdateOrAdd.updateEventInfo(eventCard.copy(typeEvent = types.value.firstOrNull{ x -> x.title == it }!!.id))}
-                    )
-
-                    val mDatePickerDialog = DatePickerDialog(
-                        mContext,
-                        { _: DatePicker, mYear: Int, mMonth: Int, mDayOfMonth: Int ->
-                            mDate.value = "$mYear-${mMonth+1}-$mDayOfMonth"
-                            viewModelUpdateOrAdd.updateEventInfo(eventCard.copy(date = "$mYear-${mMonth+1}-$mDayOfMonth"))
-                        }, mYear, mMonth, mDay
-                    )
-                    Spacer(modifier = Modifier.padding(10.dp))
-
-                    myField(myText = "Длинное описание события", text = eventCard.descLong + "",
-                        onValueChange = {it -> viewModelUpdateOrAdd.updateEventInfo(eventCard.copy(descLong = it))})
-
-                    Spacer(modifier = Modifier.padding(10.dp))
-
-                    Text(
-                        text = mDate.value,
-                        fontSize = 18.sp,
-                        modifier = Modifier
-                            .align(alignment = Alignment.CenterHorizontally)
-                            .clickable {
-                                mDatePickerDialog.show()
-                            }
-                    )
-                    Spacer(modifier = Modifier.padding(10.dp))
-                    when(eventState)
-                    {
-                        is EventState.Initialized -> {
-                            Spacer(modifier = Modifier.width(8.dp))
+                        DropdownField(
+                            label = "Выберите возрастное исключение",
+                            items = listOf("+14", "+16", "+18"),
+                            selectedItem = selectedAgeConst,
+                            onItemSelected = { selectedAgeConst = it;
+                                viewModelUpdateOrAdd.updateEventInfo(eventCard.copy(ageConst = it.removePrefix("+").toInt()))}
+                        )
 
 
+                        var selectedTypeConst by remember { mutableStateOf("") }
 
-                            // Интеграция пикера
-                            SimpleImagePicker { uri ->
-                                selectedImageUri = uri }  // Сохраняем Uri в состоянии родителя
-
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Row (modifier = Modifier.align(alignment = Alignment.CenterHorizontally)){
-                                Button(
-                                    onClick = {
-                                        showConfirmationDialog = true
-                                    },
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = Color.Gray,
-                                        contentColor = Color.White
-                                    ),
-                                    modifier = Modifier
-                                ) {
-
-                                    Text(text = textButton, fontSize = 18.sp)
+                        LaunchedEffect(types.value) {
+                            snapshotFlow { types.value }
+                                .collect { typeList ->
+                                    selectedTypeConst = typeList.firstOrNull { x -> x.id == eventCard.typeEvent }?.title ?: ""
                                 }
-                                Button(
-                                    onClick = {
-                                        controlNav.navigate("main"){
-                                            popUpTo("EventCard/${id}") { inclusive = true }
-                                        }
-                                    },
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = Color.Gray,
-                                        contentColor = Color.White
-                                    ),
-                                    modifier = Modifier
-                                ) {
-
-                                    Text(text = "Отмена", fontSize = 18.sp)
-                                }
-                                if(showConfirmationDialog){
-                                    Dialog(
-                                        showConfirmationDialog = showConfirmationDialog,
-                                        onClick = { showConfirmationDialog = false
-                                            onClick() },
-                                        onDismissRequest = { showConfirmationDialog = false },
-                                        onClickNo = { showConfirmationDialog = false },
-                                        title = "Подтверждение",
-                                        desc = confirmation
-                                    )
-                                }
-                            }
                         }
-                        is EventState.Loading -> {
-                            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-                        }
-                        is EventState.Error -> {
-                            Spacer(modifier = Modifier.width(8.dp))
 
-                            // Интеграция пикера
-                            SimpleImagePicker { uri ->
-                                selectedImageUri = uri }  // Сохраняем Uri в состоянии родителя
+                        DropdownField(
+                            label = "Выберите категорию",
+                            items = typString,
+                            selectedItem = selectedTypeConst,
+                            onItemSelected = { selectedTypeConst = it;
+                                viewModelUpdateOrAdd.updateEventInfo(eventCard.copy(typeEvent = types.value.firstOrNull{ x -> x.title == it }!!.id))}
+                        )
 
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Column (){
-                                Row (modifier = Modifier.align(alignment = Alignment.CenterHorizontally)){
+                        val mDatePickerDialog = DatePickerDialog(
+                            mContext,
+                            { _: DatePicker, mYear: Int, mMonth: Int, mDayOfMonth: Int ->
+                                mDate.value = "$mYear-${mMonth+1}-$mDayOfMonth"
+                                viewModelUpdateOrAdd.updateEventInfo(eventCard.copy(date = "$mYear-${mMonth+1}-$mDayOfMonth"))
+                            }, mYear, mMonth, mDay
+                        )
+                        Spacer(modifier = Modifier.padding(10.dp))
+
+                        myField(myText = "Длинное описание события", text = eventCard.descLong + "",
+                            onValueChange = {it -> viewModelUpdateOrAdd.updateEventInfo(eventCard.copy(descLong = it))})
+
+                        Spacer(modifier = Modifier.padding(10.dp))
+
+                        Text(
+                            text = mDate.value,
+                            fontSize = 18.sp,
+                            modifier = Modifier
+                                .align(alignment = Alignment.Center)
+                                .clickable {
+                                    mDatePickerDialog.show()
+                                }
+                        )
+                        Spacer(modifier = Modifier.padding(10.dp))
+                        when(eventState)
+                        {
+                            is EventState.Initialized -> {
+                                Spacer(modifier = Modifier.width(8.dp))
+                                // Интеграция пикера
+                                SimpleImagePicker { uri ->
+                                    selectedImageUri = uri }  // Сохраняем Uri в состоянии родителя
+
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Row (modifier = Modifier.align(alignment = Alignment.Center)){
                                     Button(
                                         onClick = {
                                             showConfirmationDialog = true
@@ -277,7 +220,6 @@ fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdate
 
                                         Text(text = textButton, fontSize = 18.sp)
                                     }
-                                    Spacer(modifier = Modifier.width(8.dp))
                                     Button(
                                         onClick = {
                                             controlNav.navigate("main"){
@@ -293,43 +235,99 @@ fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdate
 
                                         Text(text = "Отмена", fontSize = 18.sp)
                                     }
-                                }
-                                Spacer(modifier = Modifier.padding(10.dp))
-                                Text(
-                                    text = (eventState as EventState.Error).message ?: "",
-                                    color = Color.Black,
-                                    style = MaterialTheme.typography.titleLarge.copy(
-                                        fontSize = 10.sp,
-                                        shadow = Shadow(
-                                            color = Color.Black.copy(alpha = 0.5f),
-                                            offset = Offset(1f, 1f),
-                                            blurRadius = 4f
+                                    if(showConfirmationDialog){
+                                        Dialog(
+                                            showConfirmationDialog = showConfirmationDialog,
+                                            onClick = { showConfirmationDialog = false
+                                                onClick() },
+                                            onDismissRequest = { showConfirmationDialog = false },
+                                            onClickNo = { showConfirmationDialog = false },
+                                            title = "Подтверждение",
+                                            desc = confirmation
                                         )
-                                    ),
-                                    textAlign = TextAlign.Center, // Центрирование по горизонтали
-                                    modifier = Modifier.fillMaxWidth() // Занимает всю доступную ширину
-                                )
-                                if(showConfirmationDialog){
-                                    Dialog(
-                                        showConfirmationDialog = showConfirmationDialog,
-                                        onClick = { showConfirmationDialog = false
-                                            onClick() },
-                                        onDismissRequest = { showConfirmationDialog = false },
-                                        onClickNo = { showConfirmationDialog = false },
-                                        title = "Подтверждение",
-                                        desc = confirmation
-                                    )
+                                    }
                                 }
                             }
-                        }
-                        is EventState.Updated -> {
-                            controlNav.navigate("eventCard/${id}"){
-                                popUpTo("UpdateOrAdd/${id}") { inclusive = true }
+                            is EventState.Loading -> {
+                                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                             }
-                        }
-                        is EventState.DeleteOrAdd -> {
-                            controlNav.navigate("main"){
-                                popUpTo("UpdateOrAdd/${id}") { inclusive = true }
+                            is EventState.Error -> {
+                                Spacer(modifier = Modifier.width(8.dp))
+
+                                // Интеграция пикера
+                                SimpleImagePicker { uri ->
+                                    selectedImageUri = uri }  // Сохраняем Uri в состоянии родителя
+
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Column (){
+                                    Row (modifier = Modifier.align(alignment = Alignment.CenterHorizontally)){
+                                        Button(
+                                            onClick = {
+                                                showConfirmationDialog = true
+                                            },
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = Color.Gray,
+                                                contentColor = Color.White
+                                            ),
+                                            modifier = Modifier
+                                        ) {
+
+                                            Text(text = textButton, fontSize = 18.sp)
+                                        }
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Button(
+                                            onClick = {
+                                                controlNav.navigate("main"){
+                                                    popUpTo("EventCard/${id}") { inclusive = true }
+                                                }
+                                            },
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = Color.Gray,
+                                                contentColor = Color.White
+                                            ),
+                                            modifier = Modifier
+                                        ) {
+
+                                            Text(text = "Отмена", fontSize = 18.sp)
+                                        }
+                                    }
+                                    Spacer(modifier = Modifier.padding(10.dp))
+                                    Text(
+                                        text = (eventState as EventState.Error).message ?: "",
+                                        color = Color.Black,
+                                        style = MaterialTheme.typography.titleLarge.copy(
+                                            fontSize = 10.sp,
+                                            shadow = Shadow(
+                                                color = Color.Black.copy(alpha = 0.5f),
+                                                offset = Offset(1f, 1f),
+                                                blurRadius = 4f
+                                            )
+                                        ),
+                                        textAlign = TextAlign.Center, // Центрирование по горизонтали
+                                        modifier = Modifier.fillMaxWidth() // Занимает всю доступную ширину
+                                    )
+                                    if(showConfirmationDialog){
+                                        Dialog(
+                                            showConfirmationDialog = showConfirmationDialog,
+                                            onClick = { showConfirmationDialog = false
+                                                onClick() },
+                                            onDismissRequest = { showConfirmationDialog = false },
+                                            onClickNo = { showConfirmationDialog = false },
+                                            title = "Подтверждение",
+                                            desc = confirmation
+                                        )
+                                    }
+                                }
+                            }
+                            is EventState.Updated -> {
+                                controlNav.navigate("eventCard/${id}"){
+                                    popUpTo("UpdateOrAdd/${id}") { inclusive = true }
+                                }
+                            }
+                            is EventState.DeleteOrAdd -> {
+                                controlNav.navigate("main"){
+                                    popUpTo("UpdateOrAdd/${id}") { inclusive = true }
+                                }
                             }
                         }
                     }

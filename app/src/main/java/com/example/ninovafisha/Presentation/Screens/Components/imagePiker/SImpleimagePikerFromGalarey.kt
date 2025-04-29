@@ -38,7 +38,7 @@ fun SimpleImagePicker(
         }
 
 
-            Button(modifier = Modifier.padding(start = 66.dp),onClick = { launcher.launch("image/*") }) {
+            Button(modifier = Modifier,onClick = { launcher.launch("image/*") }) {
                 Text("Выбрать из галереи")
             }
 
@@ -46,7 +46,7 @@ fun SimpleImagePicker(
                 AsyncImage(
                     model = uri,
                     contentDescription = "Выбранное изображение",
-                    modifier = Modifier.size(200.dp).padding(start = 70.dp)
+                    modifier = Modifier.size(200.dp)
                 )
             }
 
