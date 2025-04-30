@@ -23,11 +23,6 @@ import kotlinx.coroutines.launch
 
 class ViewModelListEventsScreen: ViewModel() {
 
-    /*viewModelScope.launch {
-        val prof = Constant.supabase.postgrest.from("public", "Profile").select().decodeList<Profile>()
-        val filt = prof.firstOrNull { p -> p.id == Constant.supabase.auth.currentUserOrNull()?.id}
-        var name = filt?.name
-    }*/
     private val _actualState = MutableStateFlow<ActualState>(ActualState.Initialized)
     val actualState: StateFlow<ActualState> = _actualState.asStateFlow()
 
@@ -42,7 +37,6 @@ class ViewModelListEventsScreen: ViewModel() {
 
 
     private var FiltEvent = MutableLiveData<List<Event>>()
-    val filtEvent: LiveData<List<Event>> get() = FiltEvent
 
     private var _filtType: MutableList<Int> = mutableListOf()
     val filtType: List<Int> get() = _filtType
@@ -66,12 +60,6 @@ class ViewModelListEventsScreen: ViewModel() {
 
     fun RememberFiltState(textSearch:String){
         filterState.value = filterState.value.copy(textSearch = textSearch, types = _filtType)
-    }
-    fun RemoveType(id:Int){
-        _filtType.remove(id)
-    }
-    fun AddType(id:Int){
-        _filtType.add(id)
     }
     fun refresh() {
         loadEvents()
@@ -124,44 +112,13 @@ class ViewModelListEventsScreen: ViewModel() {
     }
 
     fun filtevent(filtString:String){
+        var filtered = FiltEvent.value?.filter { x -> x.title.contains(filtString) || x.desc.contains(filtString) }
         if(_filtType.isNotEmpty()){
-            var filtered = FiltEvent.value?.filter { x -> x.title.contains(filtString) || x.desc.contains(filtString) }
             filtered = filtered?.filter { x -> _filtType.contains(x.typeEvent)}
-            _events.value = filtered ?: emptyList()
         }
-        else{
-            val filtered = FiltEvent.value?.filter { x -> x.title.contains(filtString) || x.desc.contains(filtString) }
-            _events.value = filtered ?: emptyList()
-        }
+        _events.value = filtered ?: emptyList()
     }
 
-    fun filtevent(){
-        if(_filtType.isNotEmpty()){
-            var filtered = FiltEvent.value?.filter { x -> x.title.contains(filterState.value.textSearch) || x.desc.contains(filterState.value.textSearch) }
-            filtered = filtered?.filter { x -> filterState.value.types.contains(x.typeEvent)}
-            _events.value = filtered ?: emptyList()
-        }
-        else{
-            val filtered = FiltEvent.value?.filter { x -> x.title.contains(filterState.value.textSearch) || x.desc.contains(filterState.value.textSearch) }
-            _events.value = filtered ?: emptyList()
-        }
-    }
-
-
-
-    /*suspend fun GetName(): String{
-        return withContext(Dispatchers.IO) {
-            try {
-                var name = Constant.supabase.postgrest.from("public", "Profile").select().decodeList<Profile>().firstOrNull { p -> p.id == Constant.supabase.auth.currentUserOrNull()!!.id }!!.name
-                name
-            } catch (ex: AuthRestException) {
-                "Ошибка: " + ex.message
-            }
-            catch (ex: Exception){
-                "авторизация не выполнена"
-            }
-        }
-    }*/
     fun GetOut(controller: NavHostController){
         viewModelScope.launch {
             Constant.supabase.auth.signOut()
