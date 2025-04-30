@@ -64,16 +64,26 @@ class ViewModelListEventsScreen: ViewModel() {
     fun refresh() {
         loadEvents()
         loadTypes()
-        viewModelScope.launch {
-            _user.value = Constant.supabase.auth.currentUserOrNull()?.id
-            var id = Constant.supabase.auth.currentUserOrNull()?.id ?: ""
-            if(id != ""){
-                _userRole.value = Constant.supabase.postgrest.from("Profile").select{ filter { eq("id", value = "${id}") }}.decodeSingleOrNull()
+        loadUser()
+    }
+
+    fun loadUser(){
+        _actualState.value = ActualState.Loading
+        try {
+            viewModelScope.launch {
+                _user.value = Constant.supabase.auth.currentUserOrNull()?.id
+                var id = Constant.supabase.auth.currentUserOrNull()?.id ?: ""
+                if(id != ""){
+                    _userRole.value = Constant.supabase.postgrest.from("Profile").select{ filter { eq("id", value = "${id}") }}.decodeSingleOrNull()
+                }
+                else{
+                    _userRole.value = null
+                }
+                Log.d("role = ", "${_userRole.value?.role}")
             }
-            else{
-                _userRole.value = null
-            }
-            Log.d("role = ", "${_userRole.value?.role}")
+        }
+        catch (e:Exception){
+            _actualState.value = ActualState.Error("${e.message} ")
         }
     }
 
