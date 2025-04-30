@@ -15,9 +15,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -33,8 +32,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.example.ninovafisha.Domain.States.ActualState
 import com.example.ninovafisha.Presentation.Screens.Components.EventCard
@@ -49,7 +46,7 @@ fun ListEventsScreen(controlNav: NavHostController, viewModelListEventsScreen: V
     val events = viewModelListEventsScreen.events.observeAsState(emptyList())
     val types = viewModelListEventsScreen.types.observeAsState(emptyList())
     val eventsState by viewModelListEventsScreen.eventsState.collectAsState()
-    val filtType = viewModelListEventsScreen.filtType
+
     val user = viewModelListEventsScreen.user
     val role = viewModelListEventsScreen.userRole
     val idd:String? = null
@@ -81,7 +78,7 @@ fun ListEventsScreen(controlNav: NavHostController, viewModelListEventsScreen: V
                             textSearch.value = it
                             viewModelListEventsScreen.filtevent(it)
                         },
-                        OnClick = {viewModelListEventsScreen.RememberFiltState(textSearch.value);
+                        OnClick = {viewModelListEventsScreen.RememberFiltState(textSearch.value)
                             viewModelListEventsScreen.refresh()}
                     )
                 }
@@ -100,7 +97,6 @@ fun ListEventsScreen(controlNav: NavHostController, viewModelListEventsScreen: V
                 }
             }
         }
-
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -156,7 +152,7 @@ fun ListEventsScreen(controlNav: NavHostController, viewModelListEventsScreen: V
 
                 Spacer(modifier = Modifier.padding(10.dp))
                 Icon(
-                    imageVector = Icons.Default.ExitToApp,
+                    imageVector = Icons.AutoMirrored.Default.ExitToApp,
                     contentDescription = "Выход",
                     modifier = Modifier
                         .padding(16.dp)
@@ -165,9 +161,6 @@ fun ListEventsScreen(controlNav: NavHostController, viewModelListEventsScreen: V
                         },
                     tint = Color.Black
                 )
-            }
-            Column {
-
             }
         }
     }
