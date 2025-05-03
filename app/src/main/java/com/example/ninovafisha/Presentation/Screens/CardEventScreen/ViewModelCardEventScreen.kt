@@ -13,6 +13,7 @@ import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.storage.storage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -45,6 +46,12 @@ class ViewModelCardEventScreen(eventId:String): ViewModel() {
         viewModelScope.launch {
             try {
                 supabase.postgrest.from("Events").delete { filter { eq("id", eventId) } }
+                if(eventCard.image != null){
+                    val path = eventCard.image!!.substringAfter("/object/public/images/")
+                    Log.d("URIIIIIII", "${path}")
+                    Constant.supabase.storage
+                        .from("images").delete(path)
+                }
                 _eventState.value = EventState.DeleteOrAdd("")
                 Log.d("Delete","Success")
             }

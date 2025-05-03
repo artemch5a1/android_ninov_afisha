@@ -59,7 +59,7 @@ fun SignUpScreen(controlNav: NavHostController, signUpViewModel: SignUpViewModel
 
     Box(modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
 
             Text(
                 text = "Регистрация",

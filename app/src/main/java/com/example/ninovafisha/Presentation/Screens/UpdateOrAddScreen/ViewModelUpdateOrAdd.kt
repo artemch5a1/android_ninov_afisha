@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.util.UUID
 
@@ -52,7 +53,9 @@ class ViewModelUpdateOrAdd(id:String?): ViewModel() {
         val cost: Double?,
         val age_const: Int,
         val Long_desc: String?,
-        val image:String?
+        val image:String?,
+        @SerialName("type_event")
+        val typeId:Int
     )
 
     init {
@@ -114,7 +117,14 @@ class ViewModelUpdateOrAdd(id:String?): ViewModel() {
                         Constant.supabase.storage
                             .from("images")
                             .upload(fileName, byt!!)
+                        if(eventCard.image != null){
+                            val path = eventCard.image!!.substringAfter("/object/public/images/")
+                            Log.d("URIIIIIII", "${path}")
+                            Constant.supabase.storage
+                                .from("images").delete(path)
+                        }
                         imageUrl = Constant.supabase.storage.from("images").publicUrl(fileName)
+
                     }
                     updateEventInfo(eventCard.copy(image = imageUrl))
                     Constant.supabase.postgrest.from("Events").update(eventCard){filter { eq("id", eventCard.id ?: "") }}
@@ -162,7 +172,8 @@ class ViewModelUpdateOrAdd(id:String?): ViewModel() {
                         date_start = eventCard.date?.toString(),
                         cost = eventCard.cost?.toDouble(),
                         age_const = eventCard.ageConst,
-                        Long_desc = eventCard.descLong, image = eventCard.image
+                        Long_desc = eventCard.descLong, image = eventCard.image,
+                            typeId = eventCard.typeEvent
                     )
                     )
                     _eventState.value = EventState.DeleteOrAdd("Event added")
