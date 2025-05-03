@@ -63,7 +63,6 @@ class ViewModelListEventsScreen: ViewModel() {
     }
     fun refresh() {
         loadEvents()
-        loadTypes()
         loadUser()
     }
 
@@ -72,9 +71,9 @@ class ViewModelListEventsScreen: ViewModel() {
         try {
             viewModelScope.launch {
                 _user.value = Constant.supabase.auth.currentUserOrNull()?.id
-                var id = Constant.supabase.auth.currentUserOrNull()?.id ?: ""
+                val id = Constant.supabase.auth.currentUserOrNull()?.id ?: ""
                 if(id != ""){
-                    _userRole.value = Constant.supabase.postgrest.from("Profile").select{ filter { eq("id", value = "${id}") }}.decodeSingleOrNull()
+                    _userRole.value = Constant.supabase.postgrest.from("Profile").select{ filter { eq("id", value = id) }}.decodeSingleOrNull()
                 }
                 else{
                     _userRole.value = null
@@ -99,18 +98,6 @@ class ViewModelListEventsScreen: ViewModel() {
                 FiltEvent.value = Constant.supabase.postgrest.from("Events").select{ filter { eq("hide", value = true) }}.decodeList()
                 _eventsState.value = !_eventsState.value
                 _events.value = FiltEvent.value
-                _actualState.value = ActualState.Initialized
-            }
-            catch (ex: Exception) {
-                _actualState.value = ActualState.Error(ex.message ?: "Ошибка получения данных")
-            }
-        }
-    }
-
-    fun loadTypes(){
-        _actualState.value = ActualState.Loading
-        viewModelScope.launch {
-            try{
                 _types.value = Constant.supabase.postgrest.from("type_event").select().decodeList()
                 _eventsState.value = !_eventsState.value
                 _actualState.value = ActualState.Initialized

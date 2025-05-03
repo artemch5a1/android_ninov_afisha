@@ -4,7 +4,6 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -50,7 +49,7 @@ class ViewModelUpdateOrAdd(id:String?): ViewModel() {
         val title: String,
         val desc: String,
         val date_start: String?,
-        val cost: Double?,
+        val cost: Float?,
         val age_const: Int,
         val Long_desc: String?,
         val image:String?,
@@ -60,39 +59,27 @@ class ViewModelUpdateOrAdd(id:String?): ViewModel() {
 
     init {
         loadEvent(id)
-        loadTypes()
+        /*loadTypes()*/
     }
 
     fun loadEvent(eventId:String?){
         _actualState.value = ActualState.Loading
-        if(eventId != "null" && eventId != null){
-            viewModelScope.launch {
-                try{
+        viewModelScope.launch {
+            if (eventId != "null" && eventId != null) {
+                try {
                     _eventCard.value = Constant.supabase
                         .from("Events")
-                        .select{ filter { eq("id", value = eventId) }}
+                        .select { filter { eq("id", value = eventId) } }
                         .decodeSingle<EventCard>()
+                    _types.value = Constant.supabase.postgrest.from("type_event").select().decodeList()
                     _actualState.value = ActualState.Success("")
-                }
-                catch (ex: Exception){
+                } catch (ex: Exception) {
                     _actualState.value = ActualState.Error("Ошибка загрузки данных: ${ex.message}")
                 }
-            }
-        }
-        else{
-            _actualState.value = ActualState.Success("")
-        }
-    }
 
-    fun loadTypes(){
-        _actualState.value = ActualState.Loading
-        viewModelScope.launch {
-            try{
+            } else {
                 _types.value = Constant.supabase.postgrest.from("type_event").select().decodeList()
-                _actualState.value = ActualState.Initialized
-            }
-            catch (ex: Exception) {
-                _actualState.value = ActualState.Error(ex.message ?: "Ошибка получения данных")
+                _actualState.value = ActualState.Success("")
             }
         }
     }
@@ -119,7 +106,7 @@ class ViewModelUpdateOrAdd(id:String?): ViewModel() {
                             .upload(fileName, byt!!)
                         if(eventCard.image != null){
                             val path = eventCard.image!!.substringAfter("/object/public/images/")
-                            Log.d("URIIIIIII", "${path}")
+                            Log.d("URIIIIIII", path)
                             Constant.supabase.storage
                                 .from("images").delete(path)
                         }
@@ -169,8 +156,8 @@ class ViewModelUpdateOrAdd(id:String?): ViewModel() {
                         SupabaseEvent(
                         title = eventCard.title,
                         desc = eventCard.desc,
-                        date_start = eventCard.date?.toString(),
-                        cost = eventCard.cost?.toDouble(),
+                        date_start = eventCard.date,
+                        cost = eventCard.cost,
                         age_const = eventCard.ageConst,
                         Long_desc = eventCard.descLong, image = eventCard.image,
                             typeId = eventCard.typeEvent

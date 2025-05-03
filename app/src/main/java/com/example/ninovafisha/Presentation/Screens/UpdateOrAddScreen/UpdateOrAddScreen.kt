@@ -13,22 +13,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -42,7 +38,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.ninovafisha.Domain.Models.EventCard
-import com.example.ninovafisha.Domain.Models.typeEvent
 import com.example.ninovafisha.Domain.States.ActualState
 import com.example.ninovafisha.Domain.States.EventState
 import com.example.ninovafisha.Presentation.Screens.CardEventScreen.SimpleImagePicker
@@ -68,9 +63,7 @@ fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdate
 
 
 
-    types.value.forEach{element ->
-        typString.add(element.title)
-    }
+
 
     val mContext = LocalContext.current // Получение контекста Android
 
@@ -87,10 +80,10 @@ fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdate
     mCalendar.time = Date()
 
     val mDate = remember { mutableStateOf("Выберите дату") }
-    var textAction:String = ""
-    var confirmation:String = ""
-    var textButton:String = ""
-    var onClick: () -> Unit
+    var textAction = ""
+    var confirmation = ""
+    var textButton = ""
+    val onClick: () -> Unit
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
     if(id == "null"){
@@ -120,6 +113,10 @@ fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdate
             }
         }
         is ActualState.Success, ActualState.Initialized -> {
+            var selectedTypeConst by remember { mutableStateOf(types.value.firstOrNull { x -> x.id == eventCard.typeEvent }?.title ?: "") }
+            types.value.forEach{element ->
+                typString.add(element.title)
+            }
             Box(modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center) {
                 LazyColumn(modifier = Modifier.padding(16.dp).align(alignment = Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -151,25 +148,15 @@ fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdate
                             label = "Выберите возрастное исключение",
                             items = listOf("+14", "+16", "+18"),
                             selectedItem = selectedAgeConst,
-                            onItemSelected = { selectedAgeConst = it;
+                            onItemSelected = { selectedAgeConst = it
                                 viewModelUpdateOrAdd.updateEventInfo(eventCard.copy(ageConst = it.removePrefix("+").toInt()))}
                         )
-
-
-                        var selectedTypeConst by remember { mutableStateOf("") }
-
-                        LaunchedEffect(types.value) {
-                            snapshotFlow { types.value }
-                                .collect { typeList ->
-                                    selectedTypeConst = typeList.firstOrNull { x -> x.id == eventCard.typeEvent }?.title ?: ""
-                                }
-                        }
 
                         DropdownField(
                             label = "Выберите категорию",
                             items = typString,
                             selectedItem = selectedTypeConst,
-                            onItemSelected = { selectedTypeConst = it;
+                            onItemSelected = { selectedTypeConst = it
                                 viewModelUpdateOrAdd.updateEventInfo(eventCard.copy(typeEvent = types.value.firstOrNull{ x -> x.title == it }!!.id))}
                         )
 
@@ -183,7 +170,7 @@ fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdate
                         Spacer(modifier = Modifier.padding(10.dp))
 
                         myField(myText = "Длинное описание события", text = eventCard.descLong + "",
-                            onValueChange = {it -> viewModelUpdateOrAdd.updateEventInfo(eventCard.copy(descLong = it))})
+                            onValueChange = {iti -> viewModelUpdateOrAdd.updateEventInfo(eventCard.copy(descLong = iti))})
 
                         Spacer(modifier = Modifier.padding(10.dp))
 
@@ -286,7 +273,7 @@ fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdate
                                     }
                                     Spacer(modifier = Modifier.padding(10.dp))
                                     Text(
-                                        text = (eventState as EventState.Error).message ?: "",
+                                        text = (eventState as EventState.Error).message,
                                         color = Color.Black,
                                         style = MaterialTheme.typography.titleLarge.copy(
                                             fontSize = 10.sp,
@@ -333,7 +320,7 @@ fun UpdateOrAddScreen(id:String?, controlNav: NavHostController, viewModelUpdate
                 modifier = Modifier.fillMaxSize() // Занимаем всё доступное пространство
             ) {
                 Text(
-                    text = (actualState as ActualState.Error).message  ?: "",
+                    text = (actualState as ActualState.Error).message,
                     color = Color.Black,
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontSize = 10.sp,
